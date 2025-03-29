@@ -1,62 +1,52 @@
 import React from "react";
-import axios from "axios";
 import { useFormStore } from "../stores/useFormStores";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const SignUp: React.FC = () => {
+const Login: React.FC = () => {
   const {
     formData,
-    loading,
     errorMessage,
     successMessage,
     updateFormData,
     setLoading,
-    setErrorMessage,
     setSuccessMessage,
-    clearErrorMessage,
+    setErrorMessage,
     clearSuccessMessage,
   } = useFormStore();
-
-  const navigate = useNavigate()
+  const { email, password } = formData;
   
+  const navigate = useNavigate()
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     updateFormData(name as keyof typeof formData, value);
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    clearErrorMessage();
-    clearSuccessMessage();
 
-    if (!formData.name || !formData.email || !formData.password) {
-      setErrorMessage("Please fill in all fields.");
-      setLoading(false);
-      return;
-    }
-
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setErrorMessage("Please enter a valid email address.");
+    if (!email || !password) {
+      setErrorMessage("Email and password are required.");
       setLoading(false);
       return;
     }
 
     try {
-      const response = await axios.post("http://localhost:4000/api/auth/signup", formData);
+      const response = await axios.post(
+        "http://localhost:4000/api/auth/login",
+        formData
+      );
       console.log("Response:", response.data);
-
-      setSuccessMessage("Sign-up successful!");
-
+      setSuccessMessage("Login successful!");
       setTimeout(() => {
         clearSuccessMessage();
       }, 3000);
-
-      navigate("/login")
-      
+      Navigate()
     } catch (error) {
       console.error("Error:", error);
-      setErrorMessage("There was an error signing up. Please try again!");
+      setErrorMessage("There was an error. Please try again!");
     } finally {
       setLoading(false);
     }
@@ -77,10 +67,10 @@ const SignUp: React.FC = () => {
           <div className="flex flex-col items-center">
             <div className="text-center">
               <h1 className="text-2xl xl:text-4xl font-extrabold text-blue-900">
-                Sign up
+                Welcome!
               </h1>
               <p className="text-[12px] text-gray-500">
-                Hey, enter your details to create your account
+                Please enter your details to login.
               </p>
             </div>
             <div className="w-full flex-1 mt-8">
@@ -90,25 +80,19 @@ const SignUp: React.FC = () => {
               >
                 <input
                   className="input input-bordered w-full px-5 py-3 rounded-lg font-medium bg-gray-100 text-sm focus:outline-none"
-                  type="text"
-                  name="name"
-                  placeholder="Enter your name"
-                  value={formData.name}
-                  onChange={handleChange}
-                />
-                {formData.name === "" && <p className="text-red-600 text-sm">Name is required</p>}
-
-                <input
-                  className="input input-bordered w-full px-5 py-3 rounded-lg font-medium bg-gray-100 text-sm focus:outline-none"
                   type="email"
                   name="email"
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={handleChange}
                 />
-                {formData.email === "" && <p className="text-red-600 text-sm">Email is required</p>}
+                {formData.email === "" && (
+                  <p className="text-red-600 text-sm">Email is required</p>
+                )}
                 {formData.email && !/\S+@\S+\.\S+/.test(formData.email) && (
-                  <p className="text-red-600 text-sm">Please enter a valid email address.</p>
+                  <p className="text-red-600 text-sm">
+                    Please enter a valid email address.
+                  </p>
                 )}
 
                 <input
@@ -119,22 +103,27 @@ const SignUp: React.FC = () => {
                   value={formData.password}
                   onChange={handleChange}
                 />
-                {formData.password === "" && <p className="text-red-600 text-sm">Password is required</p>}
+                {formData.password === "" && (
+                  <p className="text-red-600 text-sm">Password is required</p>
+                )}
 
                 <button
                   type="submit"
                   className="btn btn-primary w-full mt-5 py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out"
-                  disabled={loading} 
                 >
-                  {loading ? "Signing Up..." : "Sign Up"}
+                  {" "}
+                  Log In
                 </button>
 
-                <p className="mt-6 text-xs text-gray-600 text-center">
-                  Already have an account?{" "}
-                  <a href="/login">
-                    <span className="text-blue-900 font-semibold">Sign in</span>
+                <div className="mt-4 flex items-center w-full text-center">
+                  <a
+                    href="/signup"
+                    className="text-xs text-gray-500 capitalize text-center w-full"
+                  >
+                    Don&apos;t have any account yet?
+                    <span className="text-blue-700"> Sign Up</span>
                   </a>
-                </p>
+                </div>
               </form>
             </div>
           </div>
@@ -164,4 +153,4 @@ const SignUp: React.FC = () => {
   );
 };
 
-export default SignUp;
+export default Login;
