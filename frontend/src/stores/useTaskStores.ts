@@ -6,14 +6,16 @@ export interface Task {
   category: string;
   completed: boolean;
 }
-
 interface TaskStore {
   tasks: Task[];
   activeCategory: string;
+  editingTaskId: number | null;
   setActiveCategory: (category: string) => void;
   addTask: (title: string, category: string) => void;
   removeTask: (id: number) => void;
   toggleTask: (id: number) => void;
+  editTask: (id: number, newTitle: string) => void;
+  setEditingTask: (id: number | null) => void;
 }
 
 export const useTaskStore = create<TaskStore>((set) => ({
@@ -23,6 +25,7 @@ export const useTaskStore = create<TaskStore>((set) => ({
   ],
   
   activeCategory: "My Day",
+  editingTaskId: null,
 
   setActiveCategory: (category) => set({ activeCategory: category }),
 
@@ -42,4 +45,14 @@ export const useTaskStore = create<TaskStore>((set) => ({
         task.id === id ? { ...task, completed: !task.completed } : task
       ),
     })),
+
+  editTask: (id, newTitle) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task.id === id ? { ...task, title: newTitle } : task
+      ),
+      editingTaskId: null
+    })),
+
+  setEditingTask: (id) => set({ editingTaskId: id }),
 }));
