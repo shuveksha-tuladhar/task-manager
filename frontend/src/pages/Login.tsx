@@ -43,7 +43,7 @@ const Login: React.FC = () => {
       setTimeout(() => {
         clearSuccessMessage();
       }, 3000);
-      Navigate()
+      navigate('/dashboard')
     } catch (error) {
       console.error("Error:", error);
       setErrorMessage("There was an error. Please try again!");
