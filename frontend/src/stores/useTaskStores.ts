@@ -6,33 +6,44 @@ export interface Task {
   category: string;
   completed: boolean;
 }
+
 interface TaskStore {
   tasks: Task[];
   activeCategory: string;
+  taskInput: string;
   editingTaskId: number | null;
   setActiveCategory: (category: string) => void;
-  addTask: (title: string, category: string) => void;
+  setTaskInput: (title: string) => void;
+  addTask: () => void;
   removeTask: (id: number) => void;
   toggleTask: (id: number) => void;
   editTask: (id: number, newTitle: string) => void;
   setEditingTask: (id: number | null) => void;
 }
 
-export const useTaskStore = create<TaskStore>((set) => ({
+export const useTaskStore = create<TaskStore>((set, get) => ({
   tasks: [
     { id: 1, title: "Buy books", category: "My Day", completed: false },
     { id: 2, title: "Meeting at 2PM", category: "Planned", completed: false },
   ],
   
   activeCategory: "My Day",
+  taskInput: "",
   editingTaskId: null,
 
   setActiveCategory: (category) => set({ activeCategory: category }),
 
-  addTask: (title, category) =>
-    set((state) => ({
-      tasks: [...state.tasks, { id: Date.now(), title, category, completed: false }],
-    })),
+  setTaskInput: (title) => set({ taskInput: title }),
+
+  addTask: () => {
+    const { taskInput, activeCategory, tasks } = get();
+    if (taskInput.trim()) {
+      set({
+        tasks: [...tasks, { id: Date.now(), title: taskInput, category: activeCategory, completed: false }],
+        taskInput: "", 
+      });
+    }
+  },
 
   removeTask: (id) =>
     set((state) => ({
@@ -51,7 +62,7 @@ export const useTaskStore = create<TaskStore>((set) => ({
       tasks: state.tasks.map((task) =>
         task.id === id ? { ...task, title: newTitle } : task
       ),
-      editingTaskId: null
+      editingTaskId: null,
     })),
 
   setEditingTask: (id) => set({ editingTaskId: id }),
