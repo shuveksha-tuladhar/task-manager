@@ -1,12 +1,5 @@
 import { create } from "zustand";
-
-export interface Task {
-  id: number;
-  title: string;
-  category: string;
-  completed: boolean;
-}
-
+import { Task } from "./types/TaskType";
 interface TaskStore {
   tasks: Task[];
   activeCategory: string;

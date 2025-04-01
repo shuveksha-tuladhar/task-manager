@@ -1,12 +1,6 @@
 import { create } from "zustand";
-
-type FormData = {
-  name: string;
-  email: string;
-  password: string;
-};
-
-type FormState = {
+import { FormData } from "./types/FormDataType";
+interface FormState {
   formData: FormData;
   loading: boolean;
   errorMessage: string | null;
@@ -17,7 +11,7 @@ type FormState = {
   clearErrorMessage: () => void;
   setSuccessMessage: (message: string | null) => void;
   clearSuccessMessage: () => void;
-};
+}
 
 export const useFormStore = create<FormState>((set) => ({
   formData: {
@@ -35,6 +29,6 @@ export const useFormStore = create<FormState>((set) => ({
   setLoading: (loading) => set({ loading }),
   setErrorMessage: (message) => set({ errorMessage: message }),
   clearErrorMessage: () => set({ errorMessage: null }),
-  setSuccessMessage: (message) => set({ successMessage: message }), 
+  setSuccessMessage: (message) => set({ successMessage: message }),
   clearSuccessMessage: () => set({ successMessage: null }),
 }));
