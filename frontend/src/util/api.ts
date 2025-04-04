@@ -46,6 +46,15 @@ export const putApi = async <T>(endpoint: string, data: any, headers = {}) => {
   }
 };
 
+export const patchApi = async <T>(endpoint: string, data: any, headers = {}) => {
+  try {
+    const response = await api.patch<T>(endpoint, data, { headers });
+    return { data: response.data, error: null };
+  } catch (error) {
+    return { data: null, error: handleError(error) };
+  }
+};
+
 export const deleteApi = async <T>(endpoint: string, headers = {}) => {
   try {
     const response = await api.delete<T>(endpoint, { headers });

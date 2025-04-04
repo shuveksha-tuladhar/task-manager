@@ -6,6 +6,7 @@ import List from "./List";
 import { getApi } from "../util/api";
 import { useListStore } from "../stores/useListStores";
 import { iconEnumMap, IconMap } from "./utils/iconEnum";
+import AddList from "./AddList";
 
 const Sidebar: React.FC = () => {
   const { list: lists, setList, setActiveList } = useListStore();
@@ -22,31 +23,36 @@ const Sidebar: React.FC = () => {
   }, [setList, setActiveList]);
 
   return (
-    <div className="w-64 h-screen bg-base-200 p-5 shadow-md">
-      <h2 className="text-xl font-bold mb-5">My Tasks</h2>
-      <ul className="space-y-2">
-        {lists
-          .filter((list) => !list.canDelete)
-          .map((list) => {
-            const IconComponent = iconEnumMap[list.name as IconMap] || null;
-            return {
-              ...list,
-              icon: IconComponent ? <IconComponent /> : <FaTasks />,
-            };
-          })
-          .map((list) => (
-            <List list={list} key={list._id} />
-          ))}
-      </ul>
-      <hr />
-      <ul className="space-y-2 ">
-        {lists
-          .filter((list) => list.canDelete)
-          .map((list) => {
-            const listWithIcon = { ...list, icon: <FaTasks /> };
-            return <List list={listWithIcon} key={listWithIcon._id} />;
-          })}
-      </ul>
+    <div className="flex flex-col h-screen w-64 bg-base-200 p-4 pb-16">
+      <div className="space-y-2 mt-4 flex-grow">
+        <h2 className="text-xl font-bold mb-5">My Tasks</h2>
+        <ul className="space-y-2">
+          {lists
+            .filter((list) => !list.canDelete)
+            .map((list) => {
+              const IconComponent = iconEnumMap[list.name as IconMap] || null;
+              return {
+                ...list,
+                icon: IconComponent ? <IconComponent /> : <FaTasks />,
+              };
+            })
+            .map((list) => (
+              <List list={list} key={list._id} />
+            ))}
+        </ul>
+        <hr />
+        <ul className="space-y-2 mt-4 flex-grow">
+          {lists
+            .filter((list) => list.canDelete)
+            .map((list) => {
+              const listWithIcon = { ...list, icon: <FaTasks /> };
+              return <List list={listWithIcon} key={listWithIcon._id} />;
+            })}
+        </ul>
+      </div>
+      <div className="mt-auto w-full">
+        <AddList />
+    </div>
     </div>
   );
 };
