@@ -1,59 +1,50 @@
 import { create } from "zustand";
-import { Task } from "./types/TaskType";
+import { TaskType } from "../components/types/TaskType";
 interface TaskStore {
-  tasks: Task[];
-  activeCategory: string;
+  tasks: TaskType[];
+  setTasks: (tasks: TaskType[]) => void;
   taskInput: string;
-  editingTaskId: number | null;
-  setActiveCategory: (category: string) => void;
   setTaskInput: (title: string) => void;
-  addTask: () => void;
-  removeTask: (id: number) => void;
-  toggleTask: (id: number) => void;
-  editTask: (id: number, newTitle: string) => void;
-  setEditingTask: (id: number | null) => void;
+  addTask: (task: TaskType) => void;
+  removeTask: (id: string) => void;
+  toggleTask: (id: string) => void;
+  editingTaskId: string | null;
+  editTask: (id: string, newTitle: string) => void;
+  setEditingTask: (id: string | null) => void;
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
-  tasks: [
-    { id: 1, title: "Buy books", category: "My Day", completed: false },
-    { id: 2, title: "Meeting at 2PM", category: "Planned", completed: false },
-  ],
-  
-  activeCategory: "My Day",
+  tasks: [],
+  setTasks: (tasks: TaskType[]) => set({ tasks }),
   taskInput: "",
-  editingTaskId: null,
-
-  setActiveCategory: (category) => set({ activeCategory: category }),
-
   setTaskInput: (title) => set({ taskInput: title }),
 
-  addTask: () => {
-    const { taskInput, activeCategory, tasks } = get();
+  addTask: (task: TaskType) => {
+    const { taskInput, tasks } = get();
     if (taskInput.trim()) {
       set({
-        tasks: [...tasks, { id: Date.now(), title: taskInput, category: activeCategory, completed: false }],
-        taskInput: "", 
+        tasks: [...tasks, task],
+        taskInput: "",
       });
     }
   },
-
   removeTask: (id) =>
     set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== id),
+      tasks: state.tasks.filter((task) => task._id !== id),
     })),
 
   toggleTask: (id) =>
     set((state) => ({
       tasks: state.tasks.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
+        task._id === id ? { ...task, completed: !task.completed } : task
       ),
     })),
 
+  editingTaskId: null,
   editTask: (id, newTitle) =>
     set((state) => ({
       tasks: state.tasks.map((task) =>
-        task.id === id ? { ...task, title: newTitle } : task
+        task._id === id ? { ...task, title: newTitle } : task
       ),
       editingTaskId: null,
     })),

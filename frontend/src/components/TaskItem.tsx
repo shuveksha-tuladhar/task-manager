@@ -1,19 +1,25 @@
 import { FaTrash, FaEdit, FaSave } from "react-icons/fa";
 import { useTaskStore } from "../stores/useTaskStores";
+import { patchApi } from "../util/api";
 
 interface TaskProps {
-  task: { id: number; title: string; completed: boolean };
+  task: { _id: string; title: string; completed: boolean };
 }
 
 const TaskItem = ({ task }: TaskProps) => {
   const { toggleTask, removeTask, editTask, setEditingTask, editingTaskId } = useTaskStore();
-  const isEditing = editingTaskId === task.id;
+  const isEditing = editingTaskId === task._id;
 
   const handleEdit = (newTitle: string) => {
     if (newTitle.trim()) {
-      editTask(task.id, newTitle);
+      editTask(task._id, newTitle);
     }
   };
+
+  const completeTask = () => {
+    patchApi("/api/tasks/" + task._id + "/completed")
+    toggleTask(task._id);
+  }
 
   return (
     <li className="flex items-center justify-between bg-base-100 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
@@ -22,7 +28,7 @@ const TaskItem = ({ task }: TaskProps) => {
           type="checkbox"
           className="checkbox checkbox-primary"
           checked={task.completed}
-          onChange={() => toggleTask(task.id)}
+          onChange={() => completeTask()}
         />
         {isEditing ? (
           <input
@@ -36,7 +42,7 @@ const TaskItem = ({ task }: TaskProps) => {
         ) : (
           <span
             className={`text-lg ${task.completed ? "line-through text-gray-400" : "text-gray-700"} cursor-pointer hover:text-gray-900`}
-            onClick={() => setEditingTask(task.id)}
+            onClick={() => setEditingTask(task._id)}
           >
             {task.title}
           </span>
@@ -49,11 +55,11 @@ const TaskItem = ({ task }: TaskProps) => {
             <FaSave />
           </button>
         ) : (
-          <button onClick={() => setEditingTask(task.id)} className="btn btn-sm btn-info tooltip" data-tip="Edit">
+          <button onClick={() => setEditingTask(task._id)} className="btn btn-sm btn-info tooltip" data-tip="Edit">
             <FaEdit />
           </button>
         )}
-        <button onClick={() => removeTask(task.id)} className="btn btn-sm btn-error tooltip" data-tip="Delete">
+        <button onClick={() => removeTask(task._id)} className="btn btn-sm btn-error tooltip" data-tip="Delete">
           <FaTrash />
         </button>
       </div>
