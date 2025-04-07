@@ -1,15 +1,15 @@
-import { FaTrash, FaEdit, FaSave } from "react-icons/fa";
+import { FaTrash, FaEdit, FaSave, FaRegStar, FaStar } from "react-icons/fa";
 import { useTaskStore } from "../stores/useTaskStores";
 import { patchApi } from "../util/api";
 import useToastStore from "./Toast/types/useToastStore";
 
 interface TaskProps {
-  task: { _id: string; title: string; completed: boolean };
+  task: { _id: string; title: string; completed: boolean; isStarred: boolean };
 }
 
 const TaskItem = ({ task }: TaskProps) => {
   const { addToast } = useToastStore();
-  const { toggleTask, removeTask, editTask, setEditingTask, editingTaskId } =
+  const { toggleComplete, removeTask, editTask, setEditingTask, editingTaskId, toggleImportant } =
     useTaskStore();
   const isEditing = editingTaskId === task._id;
 
@@ -25,12 +25,27 @@ const TaskItem = ({ task }: TaskProps) => {
     })
       .then((res) => {
         if (res.data) {
-          toggleTask(task._id);
+          toggleComplete(task._id);
         }
       })
       .catch((error) => {
         console.error(error);
         addToast({ message: "Error updating task", type: "error" });
+      });
+  };
+
+  const toggleImportantTask = () => {
+    patchApi("/api/tasks/" + task._id, {
+      isStarred: !task.isStarred,
+    })
+      .then((res) => {
+        if (res.data) {
+          toggleImportant(task._id);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        addToast({ message: "Error updating task importance", type: "error" });
       });
   };
 
@@ -67,10 +82,17 @@ const TaskItem = ({ task }: TaskProps) => {
       </div>
 
       <div className="flex gap-2">
+      <button
+            onClick={() => toggleImportantTask()}
+            className="btn btn-sm tooltip"
+            data-tip="Important"
+          >
+            {!task.isStarred ? <FaRegStar /> : <FaStar/>}
+          </button>
         {isEditing ? (
           <button
             onClick={() => setEditingTask(null)}
-            className="btn btn-sm btn-success tooltip"
+            className="btn btn-sm tooltip"
             data-tip="Save"
           >
             <FaSave />
@@ -78,7 +100,7 @@ const TaskItem = ({ task }: TaskProps) => {
         ) : (
           <button
             onClick={() => setEditingTask(task._id)}
-            className="btn btn-sm btn-info tooltip"
+            className="btn btn-sm tooltip"
             data-tip="Edit"
           >
             <FaEdit />
@@ -86,7 +108,7 @@ const TaskItem = ({ task }: TaskProps) => {
         )}
         <button
           onClick={() => removeTask(task._id)}
-          className="btn btn-sm btn-error tooltip"
+          className="btn btn-sm tooltip"
           data-tip="Delete"
         >
           <FaTrash />

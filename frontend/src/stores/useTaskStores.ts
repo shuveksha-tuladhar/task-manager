@@ -7,7 +7,8 @@ interface TaskStore {
   setTaskInput: (title: string) => void;
   addTask: (task: TaskType) => void;
   removeTask: (id: string) => void;
-  toggleTask: (id: string) => void;
+  toggleComplete: (id: string) => void;
+  toggleImportant: (id: string) => void;
   editingTaskId: string | null;
   editTask: (id: string, newTitle: string) => void;
   setEditingTask: (id: string | null) => void;
@@ -33,13 +34,20 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       tasks: state.tasks.filter((task) => task._id !== id),
     })),
 
-  toggleTask: (id) =>
+  toggleComplete: (id) =>
     set((state) => ({
       tasks: state.tasks.map((task) =>
         task._id === id ? { ...task, completed: !task.completed } : task
       ),
     })),
 
+    toggleImportant: (id) =>
+      set((state) => ({
+        tasks: state.tasks.map((task) =>
+          task._id === id ? { ...task, isStarred: !task.isStarred } : task
+        ),
+      })),
+  
   editingTaskId: null,
   editTask: (id, newTitle) =>
     set((state) => ({
