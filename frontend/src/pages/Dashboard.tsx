@@ -23,9 +23,9 @@ const Dashboard: React.FC = () => {
   }, [setTasks]);
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex grow-1 bg-gray-50 pb-2 overflow-hidden">
       <Sidebar />
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 overflow-y-scroll">
         <h1 className="text-2xl font-bold">{activeList?.name ?? "My Day"}</h1>
         <AddTask />
         <TaskList />

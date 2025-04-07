@@ -23,7 +23,7 @@ const Sidebar: React.FC = () => {
   }, [setList, setActiveList]);
 
   return (
-    <div className="flex flex-col h-screen w-64 bg-base-200 p-4 pb-16">
+    <div className="flex flex-col w-64 bg-base-200 p-4">
       <div className="space-y-2 mt-4 flex-grow">
         <h2 className="text-xl font-bold mb-5">My Tasks</h2>
         <ul className="space-y-2">
