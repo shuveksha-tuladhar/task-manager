@@ -14,7 +14,6 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     getApi<TaskType[]>("/api/tasks")
       .then((resp) => {
-        console.log(resp);
         if (resp.data) {
           setTasks(resp.data);
         }

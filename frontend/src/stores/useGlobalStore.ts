@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { ToastItem } from "../components/Toast/types/ToastItem";
 
-interface ToastState {
+interface GlobalState {
   toast: ToastItem | null;
   addToast: (toast: ToastItem) => void;
   removeToast: () => void;
 }
 
-const useGlobalStore = create<ToastState>((set) => ({
+const useGlobalStore = create<GlobalState>((set) => ({
   toast: null,
   addToast: (toast) => {
     const id = Date.now().toString();

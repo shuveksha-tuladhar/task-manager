@@ -11,11 +11,11 @@ router.post("/signup", async (req: Request, res: Response) => {
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-        res.status(400).json({ message: "User already exists" });
-        return;
+      res.status(400).json({ message: "User already exists" });
+      return;
     }
 
-    const salt = process.env.BCRYPT_SALT || await bcrypt.genSalt(12);
+    const salt = process.env.BCRYPT_SALT || (await bcrypt.genSalt(12));
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = new User({
       name,
@@ -47,7 +47,7 @@ router.post("/login", async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(
-      { userId: user?._id },
+      { userId: user._id, name: user.name },
       process.env.JWT_SECRET as string,
       { expiresIn: "1h" }
     );

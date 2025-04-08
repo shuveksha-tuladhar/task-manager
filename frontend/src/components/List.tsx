@@ -28,6 +28,7 @@ const List = ({ list: listToDelete }: ListProps) => {
       .catch((error) => {
         console.error(error);
         addToast({ message: "Error deleting List", type: "error" });
+        throw error;
       });
   };
   return (

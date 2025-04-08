@@ -6,7 +6,17 @@ const API_BASE_URL =
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 const handleError = (error: any) => {
@@ -46,7 +56,11 @@ export const putApi = async <T>(endpoint: string, data: any, headers = {}) => {
   }
 };
 
-export const patchApi = async <T>(endpoint: string, data: any, headers = {}) => {
+export const patchApi = async <T>(
+  endpoint: string,
+  data: any,
+  headers = {}
+) => {
   try {
     const response = await api.patch<T>(endpoint, data, { headers });
     return { data: response.data, error: null };

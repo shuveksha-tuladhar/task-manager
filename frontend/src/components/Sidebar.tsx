@@ -14,13 +14,15 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     getApi<ListType[]>("/api/lists")
       .then((resp) => {
-        console.log(resp);
         if (resp.data) {
           setList(resp.data);
           setActiveList(resp.data[0]);
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
   }, [setList, setActiveList]);
 
   return (

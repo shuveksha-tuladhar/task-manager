@@ -15,13 +15,13 @@ const Login: React.FC = () => {
     clearSuccessMessage,
   } = useFormStore();
   const { email, password } = formData;
-  
-  const navigate = useNavigate()
+
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     updateFormData(name as keyof typeof formData, value);
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,11 +39,16 @@ const Login: React.FC = () => {
         formData
       );
       console.log("Response:", response.data);
-      setSuccessMessage("Login successful!");
-      setTimeout(() => {
-        clearSuccessMessage();
-      }, 3000);
-      navigate('/dashboard')
+      if (response.status === 200 && response.data.token) {
+        setSuccessMessage("Login successful!");
+        setTimeout(() => {
+          clearSuccessMessage();
+        }, 3000);
+        localStorage.setItem("token", response.data.token);
+        navigate("/dashboard");
+      } else {
+        setErrorMessage("There was an error. Please try again!");
+      }
     } catch (error) {
       console.error("Error:", error);
       setErrorMessage("There was an error. Please try again!");
@@ -83,10 +88,10 @@ const Login: React.FC = () => {
                   type="email"
                   name="email"
                   placeholder="Enter your email"
-                  value={formData.email}
+                  value={formData.email || ""}
                   onChange={handleChange}
                 />
-                {formData.email === "" && (
+                {formData.email?.trim() === "" && (
                   <p className="text-red-600 text-sm">Email is required</p>
                 )}
                 {formData.email && !/\S+@\S+\.\S+/.test(formData.email) && (
@@ -100,10 +105,10 @@ const Login: React.FC = () => {
                   type="password"
                   name="password"
                   placeholder="Password"
-                  value={formData.password}
+                  value={formData.password || ""}
                   onChange={handleChange}
                 />
-                {formData.password === "" && (
+                {formData.password?.trim() === "" && (
                   <p className="text-red-600 text-sm">Password is required</p>
                 )}
 

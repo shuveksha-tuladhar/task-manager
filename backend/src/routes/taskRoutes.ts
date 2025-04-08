@@ -1,9 +1,10 @@
 import express, { Request, Response } from "express";
 import Task, { ITask } from "../models/taskModel";
+import authGuard from "../middleware/authGuard";
 
 const router = express.Router();
 
-router.post("/", async (req: Request, res: Response): Promise<void> => {
+router.post("/", authGuard, async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, listId, userId, assignedToUserId, priority } = req.body;
 
@@ -22,7 +23,7 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-router.get("/", async (req: Request, res: Response): Promise<void> => {
+router.get("/", authGuard, async (req: Request, res: Response): Promise<void> => {
   try {
     const tasks: ITask[] = await Task.find();
     res.status(200).json(tasks);
@@ -31,7 +32,7 @@ router.get("/", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-router.get("/:id", async (req: Request, res: Response): Promise<void> => {
+router.get("/:id", authGuard, async (req: Request, res: Response): Promise<void> => {
   try {
     const task: ITask | null = await Task.findById(req.params.id);
     res.status(200).json(task);
@@ -40,7 +41,7 @@ router.get("/:id", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-router.put("/:id", async (req: Request, res: Response): Promise<void> => {
+router.put("/:id", authGuard, async (req: Request, res: Response): Promise<void> => {
   try {
     const updatedTask: ITask | null = await Task.findByIdAndUpdate(
       req.params.id,
@@ -59,7 +60,7 @@ router.put("/:id", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-router.patch("/:id", async (req: Request, res: Response): Promise<void> => {
+router.patch("/:id", authGuard, async (req: Request, res: Response): Promise<void> => {
   try {
     const updatedTask: ITask | null = await Task.findByIdAndUpdate(
       req.params.id,
@@ -78,7 +79,7 @@ router.patch("/:id", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
+router.delete("/:id", authGuard, async (req: Request, res: Response): Promise<void> => {
   try {
     const deletedTask: ITask | null = await Task.findByIdAndDelete(
       req.params.id
@@ -96,7 +97,7 @@ router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
 });
 
 router.patch(
-  "/:id/complete",
+  "/:id/complete", authGuard,
   async (req: Request, res: Response): Promise<void> => {
     try {
       const task: ITask | null = await Task.findById(req.params.id);
