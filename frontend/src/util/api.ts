@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
+import { navigate } from "./navigation";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
@@ -18,6 +19,25 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      localStorage.removeItem("token");
+      navigate("/401");
+      return Promise.reject(error);
+    } else if (error?.response?.status === 403) {
+      localStorage.removeItem("token");
+      navigate("/403");
+      return Promise.reject(error);
+    } else if (error?.response?.status === 500) {
+      navigate("/500");
+      return Promise.reject(error);
+    }
+
+  }
+);
 
 const handleError = (error: any) => {
   return {

@@ -93,7 +93,7 @@ const SignUp: React.FC = () => {
                   type="text"
                   name="name"
                   placeholder="Enter your name"
-                  value={formData.name}
+                  value={formData.name || ''}
                   onChange={handleChange}
                 />
                 {formData.name === "" && <p className="text-red-600 text-sm">Name is required</p>}
@@ -103,7 +103,7 @@ const SignUp: React.FC = () => {
                   type="email"
                   name="email"
                   placeholder="Enter your email"
-                  value={formData.email}
+                  value={formData.email || ''}
                   onChange={handleChange}
                 />
                 {formData.email === "" && <p className="text-red-600 text-sm">Email is required</p>}
@@ -116,7 +116,7 @@ const SignUp: React.FC = () => {
                   type="password"
                   name="password"
                   placeholder="Password"
-                  value={formData.password}
+                  value={formData.password || ''}
                   onChange={handleChange}
                 />
                 {formData.password === "" && <p className="text-red-600 text-sm">Password is required</p>}

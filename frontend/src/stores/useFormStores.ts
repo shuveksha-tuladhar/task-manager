@@ -15,7 +15,7 @@ interface FormState {
 
 export const useFormStore = create<FormState>((set) => ({
   formData: {
-    name: "",
+    name: undefined,
     email: undefined,
     password: undefined,
   },
