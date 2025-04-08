@@ -12,6 +12,7 @@ import { setNavigate } from "./util/navigation.ts";
 import Error401 from "./pages/Error401.tsx";
 import Error403 from "./pages/Error403.tsx";
 import Error500 from "./pages/Error500.tsx";
+import ConfirmModal from "./components/ConfirmModal.tsx";
 
 const App: React.FC = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const App: React.FC = () => {
         <Route path="/403" element={<Error403 />} />
         <Route path="/500" element={<Error500 />} />
       </Routes>
+      <ConfirmModal />
       <Footer />
     </div>
   );

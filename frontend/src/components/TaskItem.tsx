@@ -4,9 +4,12 @@ import { deleteApi, patchApi } from "../util/api";
 import useGlobalStore from "../stores/useGlobalStore";
 import { TaskType } from "./types/TaskType";
 import { TaskProps } from "./types/TaskProps";
+import { useListStore } from "../stores/useListStores";
+import { ListEnum } from "./types/ListEnum";
 
 const TaskItem = ({ task }: TaskProps) => {
-  const { addToast } = useGlobalStore();
+  const { addToast, openModal, closeModal } = useGlobalStore();
+  const { activeList } = useListStore();
   const {
     toggleComplete,
     removeTask,
@@ -75,19 +78,29 @@ const TaskItem = ({ task }: TaskProps) => {
   };
 
   const handleDeleteTask = () => {
-    deleteApi<TaskType>("/api/tasks/" + task._id)
-      .then((resp) => {
-        if (resp.data) {
-          removeTask(task._id);
-          addToast({ message: "Task deleted successfully", type: "success" });
-        } else {
-          addToast({ message: "Error deleting task", type: "error" });
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        addToast({ message: "Error deleting task", type: "error" });
-      });
+    openModal({
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this task?",
+      onConfirm: () => {
+        deleteApi<TaskType>("/api/tasks/" + task._id)
+          .then((resp) => {
+            if (resp.data) {
+              removeTask(task._id);
+              addToast({
+                message: "Task deleted successfully",
+                type: "success",
+              });
+            } else {
+              addToast({ message: "Error deleting task", type: "error" });
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            addToast({ message: "Error deleting task", type: "error" });
+          })
+          .finally(() => closeModal());
+      },
+    });
   };
 
   return (
@@ -127,6 +140,10 @@ const TaskItem = ({ task }: TaskProps) => {
           onClick={() => toggleImportantTask()}
           className="btn btn-sm tooltip"
           data-tip="Important"
+          disabled={
+            activeList?.name === ListEnum.Important &&
+            activeList._id === task.listId
+          }
         >
           {!task.isStarred ? <FaRegStar /> : <FaStar />}
         </button>
