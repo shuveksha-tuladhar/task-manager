@@ -10,7 +10,9 @@ const TaskList: React.FC = () => {
 
   const filteredTasks: TaskType[] =
     activeList?.name === ListEnum.Important
-      ? tasks.filter((task) => task.isStarred)
+      ? tasks.filter(
+          (task) => task.isStarred || task.listId === activeList?._id
+        )
       : tasks.filter((task) => task.listId === activeList?._id);
 
   const taskNotCompleted = filteredTasks
@@ -29,11 +31,10 @@ const TaskList: React.FC = () => {
         <ul className="space-y-3">
           {taskNotCompleted}
           {taskCompleted.length > 0 && (
-            <>
-              <h3 className="text-xl font-semibold mb-4">Completed</h3>
-
-              {taskCompleted}
-            </>
+            <div>
+              <h3 className="text-xl font-semibold mt-4 mb-4">Completed</h3>
+              <ul className="space-y-3">{taskCompleted}</ul>
+            </div>
           )}
         </ul>
       )}
