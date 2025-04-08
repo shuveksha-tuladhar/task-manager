@@ -1,26 +1,51 @@
-import { FaTrash, FaEdit, FaSave, FaRegStar, FaStar } from "react-icons/fa";
+import { FaTrash, FaRegStar, FaStar } from "react-icons/fa";
 import { useTaskStore } from "../stores/useTaskStores";
-import { patchApi } from "../util/api";
+import { deleteApi, patchApi } from "../util/api";
 import useToastStore from "./Toast/types/useToastStore";
-
-interface TaskProps {
-  task: { _id: string; title: string; completed: boolean; isStarred: boolean };
-}
+import { TaskType } from "./types/TaskType";
+import { TaskProps } from "./types/TaskProps";
 
 const TaskItem = ({ task }: TaskProps) => {
   const { addToast } = useToastStore();
-  const { toggleComplete, removeTask, editTask, setEditingTask, editingTaskId, toggleImportant } =
-    useTaskStore();
+  const {
+    toggleComplete,
+    removeTask,
+    editTask,
+    setEditingTask,
+    editingTaskId,
+    toggleImportant,
+  } = useTaskStore();
   const isEditing = editingTaskId === task._id;
 
   const handleEdit = (newTitle: string) => {
-    if (newTitle.trim()) {
-      editTask(task._id, newTitle);
+    if (newTitle.trim() && newTitle !== task.title) {
+      patchApi<TaskType>("/api/tasks/" + task._id, {
+        title: newTitle,
+      })
+        .then((res) => {
+          if (res.data) {
+            editTask(task._id, newTitle);
+            addToast({
+              message: "Title updated successfully",
+              type: "success",
+            });
+          } else {
+            addToast({ message: "Error updating title", type: "error" });
+          }
+          setEditingTask(null);
+        })
+        .catch((error) => {
+          console.error(error);
+          addToast({ message: "Error updating title", type: "error" });
+          setEditingTask(null);
+        });
+    } else {
+      setEditingTask(null);
     }
   };
 
   const completeTask = () => {
-    patchApi("/api/tasks/" + task._id, {
+    patchApi<TaskType>("/api/tasks/" + task._id, {
       completed: !task.completed,
     })
       .then((res) => {
@@ -35,7 +60,7 @@ const TaskItem = ({ task }: TaskProps) => {
   };
 
   const toggleImportantTask = () => {
-    patchApi("/api/tasks/" + task._id, {
+    patchApi<TaskType>("/api/tasks/" + task._id, {
       isStarred: !task.isStarred,
     })
       .then((res) => {
@@ -46,6 +71,22 @@ const TaskItem = ({ task }: TaskProps) => {
       .catch((error) => {
         console.error(error);
         addToast({ message: "Error updating task importance", type: "error" });
+      });
+  };
+
+  const handleDeleteTask = () => {
+    deleteApi<TaskType>("/api/tasks/" + task._id)
+      .then((resp) => {
+        if (resp.data) {
+          removeTask(task._id);
+          addToast({ message: "Task deleted successfully", type: "success" });
+        } else {
+          addToast({ message: "Error deleting task", type: "error" });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        addToast({ message: "Error deleting task", type: "error" });
       });
   };
 
@@ -71,7 +112,7 @@ const TaskItem = ({ task }: TaskProps) => {
           />
         ) : (
           <span
-            className={`text-lg ${
+            className={`text-lg flex-grow ${
               task.completed ? "line-through text-gray-400" : "text-gray-700"
             } cursor-pointer hover:text-gray-900`}
             onClick={() => setEditingTask(task._id)}
@@ -81,33 +122,16 @@ const TaskItem = ({ task }: TaskProps) => {
         )}
       </div>
 
-      <div className="flex gap-2">
-      <button
-            onClick={() => toggleImportantTask()}
-            className="btn btn-sm tooltip"
-            data-tip="Important"
-          >
-            {!task.isStarred ? <FaRegStar /> : <FaStar/>}
-          </button>
-        {isEditing ? (
-          <button
-            onClick={() => setEditingTask(null)}
-            className="btn btn-sm tooltip"
-            data-tip="Save"
-          >
-            <FaSave />
-          </button>
-        ) : (
-          <button
-            onClick={() => setEditingTask(task._id)}
-            className="btn btn-sm tooltip"
-            data-tip="Edit"
-          >
-            <FaEdit />
-          </button>
-        )}
+      <div className="flex gap-2 ml-4">
         <button
-          onClick={() => removeTask(task._id)}
+          onClick={() => toggleImportantTask()}
+          className="btn btn-sm tooltip"
+          data-tip="Important"
+        >
+          {!task.isStarred ? <FaRegStar /> : <FaStar />}
+        </button>
+        <button
+          onClick={handleDeleteTask}
           className="btn btn-sm tooltip"
           data-tip="Delete"
         >

@@ -8,7 +8,7 @@ const AddList: React.FC = () => {
   const { listInput, setListInput, list, setList, setActiveList } = useListStore();
   const { addToast } = useToastStore();
 
-  const addList = () => {
+  const handleAddList = () => {
     postApi<ListType>("/api/lists", {
       name: listInput,
       userId: "67e70326de9957df819ceb17", // TODO: use the logged user ID
@@ -49,7 +49,7 @@ const AddList: React.FC = () => {
       />
       <button
         className="btn btn-primary"
-        onClick={() => addList()}
+        onClick={handleAddList}
         disabled={!listInput.trim()}
       >
         <FaPlus />

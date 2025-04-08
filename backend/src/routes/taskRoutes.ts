@@ -12,7 +12,7 @@ router.post("/", async (req: Request, res: Response): Promise<void> => {
       listId,
       userId,
       assignedTo: [assignedToUserId],
-      priority,
+      priority: priority ?? "low",
     });
 
     await newTask.save();
@@ -77,7 +77,6 @@ router.patch("/:id", async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
   try {
