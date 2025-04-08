@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import useToastStore from "./types/useToastStore";
+import useGlobalStore from "../../stores/useGlobalStore";
 
 const Toast: React.FC = () => {
-  const { toast, removeToast } = useToastStore();
+  const { toast, removeToast } = useGlobalStore();
 
   useEffect(() => {
     const timer = setTimeout(() => removeToast(), 4000);

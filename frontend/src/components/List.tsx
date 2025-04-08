@@ -2,11 +2,11 @@ import { FaTrash } from "react-icons/fa";
 import { useListStore } from "../stores/useListStores";
 import { ListProps } from "./types/ListProps";
 import { deleteApi } from "../util/api";
-import useToastStore from "./Toast/types/useToastStore";
+import useGlobalStore from "../stores/useGlobalStore";
 
-const List = ({ list }: ListProps) => {
-  const { activeList, setActiveList, removeList } = useListStore();
-  const { addToast } = useToastStore();
+const List = ({ list: listToDelete }: ListProps) => {
+  const { list, activeList, setActiveList, removeList } = useListStore();
+  const { addToast } = useGlobalStore();
 
   const deleteList = (id: string) => {
     deleteApi("/api/lists/" + id)
@@ -14,8 +14,9 @@ const List = ({ list }: ListProps) => {
         console.log(resp);
         if (resp.data) {
           removeList(id);
-          // If active list is current list to be deleted
-          // setActiveList();
+          if (activeList?._id === id) {
+            setActiveList(list[0]);
+          }
         } else {
           console.error(resp.error);
           addToast({
@@ -30,23 +31,23 @@ const List = ({ list }: ListProps) => {
       });
   };
   return (
-    <li key={list._id} className="group">
+    <li key={listToDelete._id} className="group">
       <button
         className={`flex items-center gap-3 p-3 w-full rounded-md transition ${
-          activeList?._id === list._id
+          activeList?._id === listToDelete._id
             ? "bg-primary text-white"
             : "hover:bg-base-300"
         }`}
-        onClick={() => setActiveList(list)}
+        onClick={() => setActiveList(listToDelete)}
       >
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
-            {list.icon}
-            <span className="ml-3">{list.name}</span>
+            {listToDelete.icon}
+            <span className="ml-3">{listToDelete.name}</span>
           </div>
-          {list.canDelete && (
+          {listToDelete.canDelete && (
             <button
-              onClick={() => deleteList(list._id)}
+              onClick={() => deleteList(listToDelete._id)}
               className="btn btn-sm tooltip invisible group-hover:visible transition-all"
               data-tip="Delete"
             >

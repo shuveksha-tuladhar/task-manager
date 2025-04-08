@@ -3,12 +3,12 @@ import { useTaskStore } from "../stores/useTaskStores";
 import { useListStore } from "../stores/useListStores";
 import { postApi } from "../util/api";
 import { TaskType } from "./types/TaskType";
-import useToastStore from "./Toast/types/useToastStore";
+import useGlobalStore from "../stores/useGlobalStore";
 
 const AddTask: React.FC = () => {
   const { taskInput, setTaskInput, addTask } = useTaskStore();
   const { activeList } = useListStore();
-  const { addToast } = useToastStore();
+  const { addToast } = useGlobalStore();
 
   const handleAddTask = () => {
     postApi<TaskType>("/api/tasks", {

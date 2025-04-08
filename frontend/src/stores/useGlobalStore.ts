@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ToastItem } from "./ToastItem";
+import { ToastItem } from "../components/Toast/types/ToastItem";
 
 interface ToastState {
   toast: ToastItem | null;
@@ -7,7 +7,7 @@ interface ToastState {
   removeToast: () => void;
 }
 
-const useToastStore = create<ToastState>((set) => ({
+const useGlobalStore = create<ToastState>((set) => ({
   toast: null,
   addToast: (toast) => {
     const id = Date.now().toString();
@@ -16,4 +16,4 @@ const useToastStore = create<ToastState>((set) => ({
   removeToast: () => set({ toast: null }),
 }));
 
-export default useToastStore;
+export default useGlobalStore;

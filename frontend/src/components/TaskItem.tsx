@@ -1,12 +1,12 @@
 import { FaTrash, FaRegStar, FaStar } from "react-icons/fa";
 import { useTaskStore } from "../stores/useTaskStores";
 import { deleteApi, patchApi } from "../util/api";
-import useToastStore from "./Toast/types/useToastStore";
+import useGlobalStore from "../stores/useGlobalStore";
 import { TaskType } from "./types/TaskType";
 import { TaskProps } from "./types/TaskProps";
 
 const TaskItem = ({ task }: TaskProps) => {
-  const { addToast } = useToastStore();
+  const { addToast } = useGlobalStore();
   const {
     toggleComplete,
     removeTask,

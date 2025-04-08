@@ -2,11 +2,11 @@ import { FaPlus } from "react-icons/fa";
 import { useListStore } from "../stores/useListStores";
 import { ListType } from "./types/ListType";
 import { postApi } from "../util/api";
-import useToastStore from "./Toast/types/useToastStore";
+import useGlobalStore from "../stores/useGlobalStore";
 
 const AddList: React.FC = () => {
   const { listInput, setListInput, list, setList, setActiveList } = useListStore();
-  const { addToast } = useToastStore();
+  const { addToast } = useGlobalStore();
 
   const handleAddList = () => {
     postApi<ListType>("/api/lists", {

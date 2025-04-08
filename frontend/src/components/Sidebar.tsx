@@ -5,8 +5,9 @@ import { useEffect } from "react";
 import List from "./List";
 import { getApi } from "../util/api";
 import { useListStore } from "../stores/useListStores";
-import { iconEnumMap, IconMap } from "./utils/iconEnum";
+import { iconEnumMap } from "./utils/iconEnumMap";
 import AddList from "./AddList";
+import { ListEnum } from "./types/ListEnum";
 
 const Sidebar: React.FC = () => {
   const { list: lists, setList, setActiveList } = useListStore();
@@ -23,14 +24,14 @@ const Sidebar: React.FC = () => {
   }, [setList, setActiveList]);
 
   return (
-    <div className="flex flex-col w-64 bg-base-200 p-4">
+    <div className="flex flex-col w-64 bg-white p-4 border-t-[1px] border-t-black/10">
       <div className="space-y-2 mt-4 flex-grow">
         <h2 className="text-xl font-bold mb-5">My Tasks</h2>
         <ul className="space-y-2">
           {lists
             .filter((list) => !list.canDelete)
             .map((list) => {
-              const IconComponent = iconEnumMap[list.name as IconMap] || null;
+              const IconComponent = iconEnumMap[list.name as ListEnum] || null;
               return {
                 ...list,
                 icon: IconComponent ? <IconComponent /> : <FaTasks />,
@@ -40,8 +41,7 @@ const Sidebar: React.FC = () => {
               <List list={list} key={list._id} />
             ))}
         </ul>
-        <hr />
-        <ul className="space-y-2 mt-4 flex-grow">
+        <ul className="space-y-2 py-2 flex-grow border-t-[1px] border-t-black/10">
           {lists
             .filter((list) => list.canDelete)
             .map((list) => {
@@ -52,7 +52,7 @@ const Sidebar: React.FC = () => {
       </div>
       <div className="mt-auto w-full">
         <AddList />
-    </div>
+      </div>
     </div>
   );
 };

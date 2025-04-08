@@ -1,12 +1,17 @@
 import { useListStore } from "../stores/useListStores";
 import TaskItem from "./TaskItem";
 import { useTaskStore } from "../stores/useTaskStores";
+import { TaskType } from "./types/TaskType";
+import { ListEnum } from "./types/ListEnum";
 
 const TaskList: React.FC = () => {
   const { activeList } = useListStore();
   const { tasks } = useTaskStore();
 
-  const filteredTasks = tasks.filter((task) => task.listId === activeList?._id);
+  const filteredTasks: TaskType[] =
+    activeList?.name === ListEnum.Important
+      ? tasks.filter((task) => task.isStarred)
+      : tasks.filter((task) => task.listId === activeList?._id);
 
   const taskNotCompleted = filteredTasks
     .filter((task) => !task.completed)
