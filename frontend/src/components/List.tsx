@@ -6,30 +6,37 @@ import useGlobalStore from "../stores/useGlobalStore";
 
 const List = ({ list: listToDelete }: ListProps) => {
   const { list, activeList, setActiveList, removeList } = useListStore();
-  const { addToast } = useGlobalStore();
+  const { addToast, openModal, closeModal } = useGlobalStore();
 
   const deleteList = (id: string) => {
-    deleteApi("/api/lists/" + id)
-      .then((resp) => {
-        console.log(resp);
-        if (resp.data) {
-          removeList(id);
-          if (activeList?._id === id) {
-            setActiveList(list[0]);
-          }
-        } else {
-          console.error(resp.error);
-          addToast({
-            message: resp?.error?.message ?? "Error deleting List",
-            type: "error",
-          });
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        addToast({ message: "Error deleting List", type: "error" });
-        throw error;
-      });
+    openModal({
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this list?",
+      onConfirm: () => {
+        deleteApi("/api/lists/" + id)
+          .then((resp) => {
+            console.log(resp);
+            if (resp.data) {
+              removeList(id);
+              if (activeList?._id === id) {
+                setActiveList(list[0]);
+              }
+            } else {
+              console.error(resp.error);
+              addToast({
+                message: resp?.error?.message ?? "Error deleting List",
+                type: "error",
+              });
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            addToast({ message: "Error deleting List", type: "error" });
+            throw error;
+          })
+          .finally(() => closeModal());
+      },
+    });
   };
   return (
     <li key={listToDelete._id} className="group">
