@@ -15,7 +15,6 @@ const List = ({ list: listToDelete }: ListProps) => {
       onConfirm: () => {
         deleteApi("/api/lists/" + id)
           .then((resp) => {
-            console.log(resp);
             if (resp.data) {
               removeList(id);
               if (activeList?._id === id) {

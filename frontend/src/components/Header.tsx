@@ -15,7 +15,6 @@ const Header: React.FC = () => {
     if (isLoggedIn && !user) {
       getApi<User>("/api/users/profile")
         .then((resp) => {
-          console.log(resp.data);
           setUser(resp.data as User);
         })
         .catch((error) => console.error("Failed to fetch user info:", error));
