@@ -24,7 +24,6 @@ router.get("/profile", authGuard, async (req: Request, res: Response) => {
 
 router.get("/:id", authGuard, async (req: Request, res: Response) => {
   try {
-    console.log('Id:', req.params.id)
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
       res.status(404).json({ message: "User not found" });
