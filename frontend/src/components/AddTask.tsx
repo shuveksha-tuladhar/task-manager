@@ -4,6 +4,7 @@ import { useListStore } from "../stores/useListStores";
 import { postApi } from "../util/api";
 import { TaskType } from "./types/TaskType";
 import useGlobalStore from "../stores/useGlobalStore";
+import { ListEnum } from "./types/ListEnum";
 
 const AddTask: React.FC = () => {
   const { taskInput, setTaskInput, addTask } = useTaskStore();
@@ -14,8 +15,7 @@ const AddTask: React.FC = () => {
     postApi<TaskType>("/api/tasks", {
       title: taskInput,
       listId: activeList?._id,
-      userId: "67e70326de9957df819ceb17", // TODO: use the logged user ID
-      assignedToUserId: "67e70326de9957df819ceb17", // TODO: use the logged user ID
+      isStarred: activeList?.name === ListEnum.Important,
     })
       .then((res) => {
         if (res.data) {

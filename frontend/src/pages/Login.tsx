@@ -2,6 +2,7 @@ import React from "react";
 import { useFormStore } from "../stores/useFormStores";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../util/api";
 
 const Login: React.FC = () => {
   const {
@@ -35,7 +36,7 @@ const Login: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/auth/login",
+        API_BASE_URL + "/api/auth/login",
         formData
       );
       console.log("Response:", response.data);

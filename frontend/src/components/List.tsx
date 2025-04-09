@@ -38,15 +38,24 @@ const List = ({ list: listToDelete }: ListProps) => {
       },
     });
   };
+
   return (
     <li key={listToDelete._id} className="group">
-      <button
-        className={`flex items-center gap-3 p-3 w-full rounded-md transition ${
+      <div
+        role="button"
+        tabIndex={0}
+        className={`flex items-center gap-3 p-3 w-full rounded-md transition cursor-pointer ${
           activeList?._id === listToDelete._id
             ? "bg-primary text-white"
             : "hover:bg-base-300"
         }`}
         onClick={() => setActiveList(listToDelete)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setActiveList(listToDelete);
+          }
+        }}
       >
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
@@ -55,7 +64,10 @@ const List = ({ list: listToDelete }: ListProps) => {
           </div>
           {listToDelete.canDelete && (
             <button
-              onClick={() => deleteList(listToDelete._id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteList(listToDelete._id);
+              }}
               className="btn btn-sm tooltip invisible group-hover:visible transition-all"
               data-tip="Delete"
             >
@@ -63,7 +75,7 @@ const List = ({ list: listToDelete }: ListProps) => {
             </button>
           )}
         </div>
-      </button>
+      </div>
     </li>
   );
 };

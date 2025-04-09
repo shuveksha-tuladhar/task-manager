@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { useFormStore } from "../stores/useFormStores";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../util/api";
 
 const SignUp: React.FC = () => {
   const {
@@ -17,8 +18,8 @@ const SignUp: React.FC = () => {
     clearSuccessMessage,
   } = useFormStore();
 
-  const navigate = useNavigate()
-  
+  const navigate = useNavigate();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     updateFormData(name as keyof typeof formData, value);
@@ -43,7 +44,10 @@ const SignUp: React.FC = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:4000/api/auth/signup", formData);
+      const response = await axios.post(
+        API_BASE_URL + "/api/auth/signup",
+        formData
+      );
       console.log("Response:", response.data);
 
       setSuccessMessage("Sign-up successful!");
@@ -52,8 +56,7 @@ const SignUp: React.FC = () => {
         clearSuccessMessage();
       }, 3000);
 
-      navigate("/login")
-      
+      navigate("/login");
     } catch (error) {
       console.error("Error:", error);
       setErrorMessage("There was an error signing up. Please try again!");
@@ -93,22 +96,28 @@ const SignUp: React.FC = () => {
                   type="text"
                   name="name"
                   placeholder="Enter your name"
-                  value={formData.name || ''}
+                  value={formData.name || ""}
                   onChange={handleChange}
                 />
-                {formData.name === "" && <p className="text-red-600 text-sm">Name is required</p>}
+                {formData.name === "" && (
+                  <p className="text-red-600 text-sm">Name is required</p>
+                )}
 
                 <input
                   className="input input-bordered w-full px-5 py-3 rounded-lg font-medium bg-gray-100 text-sm focus:outline-none"
                   type="email"
                   name="email"
                   placeholder="Enter your email"
-                  value={formData.email || ''}
+                  value={formData.email || ""}
                   onChange={handleChange}
                 />
-                {formData.email === "" && <p className="text-red-600 text-sm">Email is required</p>}
+                {formData.email === "" && (
+                  <p className="text-red-600 text-sm">Email is required</p>
+                )}
                 {formData.email && !/\S+@\S+\.\S+/.test(formData.email) && (
-                  <p className="text-red-600 text-sm">Please enter a valid email address.</p>
+                  <p className="text-red-600 text-sm">
+                    Please enter a valid email address.
+                  </p>
                 )}
 
                 <input
@@ -116,15 +125,17 @@ const SignUp: React.FC = () => {
                   type="password"
                   name="password"
                   placeholder="Password"
-                  value={formData.password || ''}
+                  value={formData.password || ""}
                   onChange={handleChange}
                 />
-                {formData.password === "" && <p className="text-red-600 text-sm">Password is required</p>}
+                {formData.password === "" && (
+                  <p className="text-red-600 text-sm">Password is required</p>
+                )}
 
                 <button
                   type="submit"
                   className="btn btn-primary w-full mt-5 py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out"
-                  disabled={loading} 
+                  disabled={loading}
                 >
                   {loading ? "Signing Up..." : "Sign Up"}
                 </button>

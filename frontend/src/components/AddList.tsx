@@ -11,7 +11,6 @@ const AddList: React.FC = () => {
   const handleAddList = () => {
     postApi<ListType>("/api/lists", {
       name: listInput,
-      userId: "67e70326de9957df819ceb17", // TODO: use the logged user ID
     })
       .then((resp) => {
         if (resp.data) {
