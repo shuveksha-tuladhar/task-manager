@@ -1,18 +1,28 @@
 import express, { Request, Response } from "express";
 import User from "../models/userModel";
+import authGuard from "../middleware/authGuard";
 
 const router = express.Router();
 
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", authGuard, async (req: Request, res: Response) => {
   try {
-    const users = await User.find();
+    const users = await User.find({_id: req.user?.userId}).select('-password');
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Failed to retrieve users", error });
   }
 });
 
-router.get("/:id", async (req: Request, res: Response) => {
+router.get("/profile", authGuard, async (req: Request, res: Response) => {
+  try {
+    const users = await User.findOne({_id: req.user?.userId}).select('-password');
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to retrieve user profile", error });
+  }
+});
+
+router.get("/:id", authGuard, async (req: Request, res: Response) => {
   try {
     console.log('Id:', req.params.id)
     const user = await User.findById(req.params.id).select('-password');
