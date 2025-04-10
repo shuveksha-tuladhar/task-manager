@@ -1,4 +1,3 @@
-import "./App.css";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Footer from "./components/Footer.tsx";
 import Header from "./components/Header.tsx";
@@ -16,6 +15,7 @@ import ConfirmModal from "./components/ConfirmModal.tsx";
 
 const App: React.FC = () => {
   const navigate = useNavigate();
+  const isLoggedIn = Boolean(localStorage.getItem("token") || false);
 
   useEffect(() => {
     setNavigate(navigate);
@@ -23,7 +23,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <Header />
+      {isLoggedIn && <Header />}
       <Toast />
       <Routes>
         <Route path="/" element={<Home />} />
