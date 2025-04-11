@@ -18,6 +18,17 @@ User-Specific Data
 - Tasks are associated with individual user accounts
 - Data is securely stored and retrieved from MongoDB
 
+## Database Schema
+This application uses MongoDB as its NoSQL database and Mongoose as the ODM for schema modeling. The full schema can be viewed [here](https://github.com/shuveksha-tuladhar/task-manager/edit/main/README.md),
+
+| Collection | Description |
+|-----------------|-------------|
+| `Users`         | Stores user information such as name, email, and password. |
+| `Lists`         | Represents task groups or categories. Each list is associated with a single user. |
+| `Tasks`         | Contains individual tasks, including status (complete/incomplete) and importance. |
+
+
+
 ## Technology Used
 Frontend
 
