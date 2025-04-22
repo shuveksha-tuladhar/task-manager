@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import AddTask from "../components/AddTask";
 import Sidebar from "../components/Sidebar";
 import TaskList from "../components/TaskList";
 import { useListStore } from "../stores/useListStores";
@@ -26,7 +25,6 @@ const Dashboard: React.FC = () => {
       <Sidebar />
       <div className="flex-1 p-6 overflow-y-scroll">
         <h1 className="text-2xl font-bold">{activeList?.name ?? "My Day"}</h1>
-        <AddTask />
         <TaskList />
       </div>
     </div>

@@ -3,9 +3,13 @@ import TaskItem from "./TaskItem";
 import { useTaskStore } from "../stores/useTaskStores";
 import { TaskType } from "./types/TaskType";
 import { ListEnum } from "./types/ListEnum";
+import TaskPanel from "./TaskPanel";
+import { useState } from "react";
+import AddTask from "./AddTask";
 
 const TaskList: React.FC = () => {
   const { activeList } = useListStore();
+  const [isOpen, setIsOpen] = useState<boolean>(true);
   const { tasks } = useTaskStore();
 
   const filteredTasks: TaskType[] =
@@ -24,11 +28,11 @@ const TaskList: React.FC = () => {
     .map((task) => <TaskItem key={task._id} task={task} />);
 
   return (
-    <div className="p-4">
+    <div className="p-4 flex flex-row">
       {filteredTasks.length === 0 ? (
         <p className="text-gray-500">No tasks in this category.</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3 flex-grow">
           {taskNotCompleted}
           {taskCompleted.length > 0 && (
             <div>
@@ -36,8 +40,10 @@ const TaskList: React.FC = () => {
               <ul className="space-y-3">{taskCompleted}</ul>
             </div>
           )}
+          <AddTask />
         </ul>
       )}
+      {isOpen && (<TaskPanel task={tasks[0] ?? []} onClose={() => setIsOpen(false)} onDelete={() => console.log('Deleted')} />)}
     </div>
   );
 };
