@@ -5,7 +5,8 @@ import { postApi } from "../util/api";
 import useGlobalStore from "../stores/useGlobalStore";
 
 const AddList: React.FC = () => {
-  const { listInput, setListInput, list, setList, setActiveList } = useListStore();
+  const { listInput, setListInput, list, setList, setActiveList } =
+    useListStore();
   const { addToast } = useGlobalStore();
 
   const handleAddList = () => {
@@ -38,21 +39,21 @@ const AddList: React.FC = () => {
   };
 
   return (
-    <div className="flex gap-2 my-4">
-      <input
-        type="text"
-        placeholder="Add a list..."
-        className="input input-bordered flex-1"
-        value={listInput}
-        onChange={(e) => setListInput(e.target.value)}
-      />
+    <div className="flex items-center gap-2 bg-white pl-3">
       <button
-        className="btn btn-primary"
+        className="flex items-center gap-1 text-blue-600 hover:underline focus:outline-none bg-white"
         onClick={handleAddList}
         disabled={!listInput.trim()}
       >
-        <FaPlus />
+        <FaPlus className="text-xs text-gray-400" />
       </button>
+      <input
+        type="text"
+        placeholder="New List"
+        className="input border-none w-full focus:outline-none"
+        value={listInput}
+        onChange={(e) => setListInput(e.target.value)}
+      />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Footer from "./components/Footer.tsx";
-import Header from "./components/Header.tsx";
+// import Header from "./components/Header.tsx";
 import Toast from "./components/Toast/Toast.tsx";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
@@ -23,7 +23,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {isLoggedIn && <Header />}
+      {isLoggedIn && <>{/* <Header/> */}</>}
       <Toast />
       <Routes>
         <Route path="/" element={<Home />} />

@@ -1,9 +1,23 @@
 import { IconType } from "react-icons";
 import { FaSun, FaStar, FaCalendarAlt } from "react-icons/fa";
 import { ListEnum } from "../types/ListEnum";
+import { TaskType } from "../types/TaskType";
 
-export const iconEnumMap: Record<ListEnum, IconType> = {
-  [ListEnum.MyDay]: FaSun,
-  [ListEnum.Important]: FaStar,
-  [ListEnum.Planned]: FaCalendarAlt,
+type ListMeta = {
+  icon: IconType;
+  fieldName?: keyof TaskType;
+};
+
+export const iconEnumMap: Record<ListEnum, ListMeta> = {
+  [ListEnum.MyDay]: {
+    icon: FaSun,
+    fieldName: "isMyDay",
+  },
+  [ListEnum.Important]: {
+    icon: FaStar,
+    fieldName: "isStarred",
+  },
+  [ListEnum.Planned]: {
+    icon: FaCalendarAlt,
+  },
 };

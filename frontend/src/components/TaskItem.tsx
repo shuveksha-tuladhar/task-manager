@@ -1,6 +1,6 @@
-import { FaTrash, FaRegStar, FaStar } from "react-icons/fa";
+import { FaRegStar, FaStar, FaCheck } from "react-icons/fa";
 import { useTaskStore } from "../stores/useTaskStores";
-import { deleteApi, patchApi } from "../util/api";
+import { patchApi } from "../util/api";
 import useGlobalStore from "../stores/useGlobalStore";
 import { TaskType } from "./types/TaskType";
 import { TaskProps } from "./types/TaskProps";
@@ -8,44 +8,9 @@ import { useListStore } from "../stores/useListStores";
 import { ListEnum } from "./types/ListEnum";
 
 const TaskItem = ({ task }: TaskProps) => {
-  const { addToast, openModal, closeModal } = useGlobalStore();
+  const { addToast } = useGlobalStore();
   const { activeList } = useListStore();
-  const {
-    toggleComplete,
-    removeTask,
-    editTask,
-    setEditingTask,
-    editingTaskId,
-    toggleImportant,
-  } = useTaskStore();
-  const isEditing = editingTaskId === task._id;
-
-  const handleEdit = (newTitle: string) => {
-    if (newTitle.trim() && newTitle !== task.title) {
-      patchApi<TaskType>("/api/tasks/" + task._id, {
-        title: newTitle,
-      })
-        .then((res) => {
-          if (res.data) {
-            editTask(task._id, newTitle);
-            addToast({
-              message: "Title updated successfully",
-              type: "success",
-            });
-          } else {
-            addToast({ message: "Error updating title", type: "error" });
-          }
-          setEditingTask(null);
-        })
-        .catch((error) => {
-          console.error(error);
-          addToast({ message: "Error updating title", type: "error" });
-          setEditingTask(null);
-        });
-    } else {
-      setEditingTask(null);
-    }
-  };
+  const { toggleComplete, setActiveTaskId, toggleImportant } = useTaskStore();
 
   const completeTask = () => {
     patchApi<TaskType>("/api/tasks/" + task._id, {
@@ -77,85 +42,48 @@ const TaskItem = ({ task }: TaskProps) => {
       });
   };
 
-  const handleDeleteTask = () => {
-    openModal({
-      title: "Confirm Delete",
-      message: "Are you sure you want to delete this task?",
-      onConfirm: () => {
-        deleteApi<TaskType>("/api/tasks/" + task._id)
-          .then((resp) => {
-            if (resp.data) {
-              removeTask(task._id);
-              addToast({
-                message: "Task deleted successfully",
-                type: "success",
-              });
-            } else {
-              addToast({ message: "Error deleting task", type: "error" });
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            addToast({ message: "Error deleting task", type: "error" });
-          })
-          .finally(() => closeModal());
-      },
-    });
-  };
-
   return (
-    <li className="flex items-center justify-between bg-base-100 p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-      <div className="flex items-center gap-3 w-full">
-        <input
-          type="checkbox"
-          className="checkbox checkbox-primary"
-          checked={task.completed}
-          onChange={() => completeTask()}
-        />
-        {isEditing ? (
-          <input
-            type="text"
-            defaultValue={task.title}
-            className="input input-bordered input-sm w-full"
-            onBlur={(e) => handleEdit(e.target.value)}
-            onKeyDown={(e) =>
-              e.key === "Enter" && handleEdit(e.currentTarget.value)
-            }
-            autoFocus
-          />
-        ) : (
+    <>
+      <li className="flex items-center justify-between bg-white p-3 rounded-md  hover:shadow-sm transition-shadow">
+        <div className="flex items-center gap-3 w-full">
+          <label className="relative inline-flex items-center justify-center w-5 h-5">
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => completeTask()}
+              className="peer w-5 h-5 rounded-full border-2 border-gray-500 bg-white checked:bg-indigo-500 checked:border-indigo-500 appearance-none cursor-pointer"
+            />
+            <FaCheck className="absolute text-white text-xs opacity-0 peer-checked:opacity-100 pointer-events-none" />
+          </label>
           <span
-            className={`text-lg flex-grow ${
-              task.completed ? "line-through text-gray-400" : "text-gray-700"
-            } cursor-pointer hover:text-gray-900`}
-            onClick={() => setEditingTask(task._id)}
+            className={`text-base flex-grow truncate text-sm ${
+              task.completed ? "line-through text-gray-400" : "text-gray-800"
+            } cursor-pointer hover:text-black`}
+            onClick={() => setActiveTaskId(task._id)}
           >
             {task.title}
           </span>
-        )}
-      </div>
+        </div>
 
-      <div className="flex gap-2 ml-4">
-        <button
-          onClick={() => toggleImportantTask()}
-          className="btn btn-sm tooltip"
-          data-tip="Important"
-          disabled={
-            activeList?.name === ListEnum.Important &&
-            activeList._id === task.listId
-          }
-        >
-          {!task.isStarred ? <FaRegStar /> : <FaStar />}
-        </button>
-        <button
-          onClick={handleDeleteTask}
-          className="btn btn-sm tooltip"
-          data-tip="Delete"
-        >
-          <FaTrash />
-        </button>
-      </div>
-    </li>
+        <div className="flex gap-1 ml-2">
+          <button
+            onClick={() => toggleImportantTask()}
+            className="btn btn-ghost btn-xs"
+            title="Mark Important"
+            disabled={
+              activeList?.name === ListEnum.Important &&
+              activeList._id === task.listId
+            }
+          >
+            {!task.isStarred ? (
+              <FaRegStar className="text-gray-500" />
+            ) : (
+              <FaStar className="text-gray-500" />
+            )}
+          </button>
+        </div>
+      </li>
+    </>
   );
 };
 

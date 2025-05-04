@@ -5,20 +5,62 @@ import {
   FaTrashAlt,
   FaSun,
   FaPaperclip,
+  FaCheck,
+  FaPlus,
+  FaAngleRight,
 } from "react-icons/fa";
-import { TaskType as Task, Step } from "./types/TaskType";
+import { Step, TaskType } from "./types/TaskType";
+import { TaskPanelProps } from "./types/TaskPanelProps";
+import { useTaskStore } from "../stores/useTaskStores";
+import useGlobalStore from "../stores/useGlobalStore";
+import { patchApi } from "../util/api";
 
-interface TaskPanelProps {
-  task: Task | null;
-  onClose: () => void;
-  onDelete: (id: string) => void;
-}
+const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
+  const { addToast } = useGlobalStore();
+  const {
+    editTask,
+    setEditingTask,
+    editingTaskId,
+    toggleImportant,
+    toggleComplete,
+  } = useTaskStore();
 
-const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete }) => {
   const [steps, setSteps] = useState<Step[]>(task?.steps || []);
   const [newStep, setNewStep] = useState("");
 
   if (!task) return null;
+
+  const isEditing = editingTaskId === task._id;
+
+  const completeTask = () => {
+    patchApi<TaskType>("/api/tasks/" + task._id, {
+      completed: !task.completed,
+    })
+      .then((res) => {
+        if (res.data) {
+          toggleComplete(task._id);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        addToast({ message: "Error updating task", type: "error" });
+      });
+  };
+
+  const toggleImportantTask = () => {
+    patchApi<TaskType>("/api/tasks/" + task._id, {
+      isStarred: !task.isStarred,
+    })
+      .then((res) => {
+        if (res.data) {
+          toggleImportant(task._id);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        addToast({ message: "Error updating task importance", type: "error" });
+      });
+  };
 
   const handleAddStep = () => {
     if (newStep.trim()) {
@@ -33,24 +75,82 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete }) => {
     setSteps(updated);
   };
 
+  const handleEdit = (newTitle: string) => {
+    if (newTitle.trim() && newTitle !== task.title) {
+      patchApi<TaskType>("/api/tasks/" + task._id, {
+        title: newTitle,
+      })
+        .then((res) => {
+          if (res.data) {
+            editTask(task._id, newTitle);
+            addToast({
+              message: "Title updated successfully",
+              type: "success",
+            });
+          } else {
+            addToast({ message: "Error updating title", type: "error" });
+          }
+          setEditingTask(null);
+        })
+        .catch((error) => {
+          console.error(error);
+          addToast({ message: "Error updating title", type: "error" });
+          setEditingTask(null);
+        });
+    } else {
+      setEditingTask(null);
+    }
+  };
+
   return (
-    <div className="right-0 top-0 h-full w-[26rem] bg-base-100 z-50 flex flex-col shadow-lg">
-      <div className="p-4 flex-1 overflow-y-auto space-y-6">
-        {/* Title */}
-        <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          className="checkbox checkbox-primary"
-          checked={task.completed}
-          onChange={() => console.log('Completed')}
-        />
-          <h3 className="text-xl font-semibold">{task.title}</h3>
-          <button className="text-yellow-500 text-lg">
+    <div className="h-full w-[26rem] bg-neutral-50 shadow-lg flex flex-col">
+      <div className="p-4 grow overflow-y-auto space-y-6">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center">
+            <label className="relative inline-flex items-center justify-center w-5 h-5 me-2">
+              <input
+                type="checkbox"
+                checked={task.completed}
+                onChange={() => completeTask()}
+                className="peer w-5 h-5 rounded-full border-2 border-gray-500 bg-white checked:bg-indigo-500 checked:border-indigo-500 appearance-none cursor-pointer"
+              />
+              <FaCheck className="absolute text-white text-xs opacity-0 peer-checked:opacity-100 pointer-events-none" />
+            </label>
+            <h3 className="text-md font-semibold">
+              {isEditing ? (
+                <input
+                  type="text"
+                  defaultValue={task.title}
+                  className="input input-sm input-bordered"
+                  onBlur={(e) => handleEdit(e.target.value)}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && handleEdit(e.currentTarget.value)
+                  }
+                  autoFocus
+                />
+              ) : (
+                <span
+                  className={`text-base flex-grow truncate text-sm ${
+                    task.completed
+                      ? "line-through text-gray-400"
+                      : "text-gray-800"
+                  } cursor-pointer hover:text-black`}
+                  onClick={() => setEditingTask(task._id)}
+                >
+                  {task.title}
+                </span>
+              )}
+            </h3>
+          </div>
+
+          <button
+            className="text-yellow-500 text-lg"
+            onClick={() => toggleImportantTask()}
+          >
             {task.isStarred ? <FaStar /> : <FaRegStar />}
           </button>
         </div>
 
-        {/* Steps */}
         <div className="space-y-2">
           <ul className="space-y-2">
             {steps.map((step, index) => (
@@ -59,8 +159,17 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete }) => {
                 className="flex items-center justify-between bg-base-200 p-3 rounded-lg shadow-sm"
               >
                 <div className="flex items-center gap-2">
-                  <input type="checkbox" checked={step.completed} readOnly className="checkbox checkbox-sm" />
-                  <span className={step.completed ? "line-through text-gray-500" : ""}>
+                  <input
+                    type="checkbox"
+                    checked={step.completed}
+                    readOnly
+                    className="checkbox checkbox-sm"
+                  />
+                  <span
+                    className={
+                      step.completed ? "line-through text-gray-500" : ""
+                    }
+                  >
                     {step.title}
                   </span>
                 </div>
@@ -73,8 +182,27 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete }) => {
               </li>
             ))}
           </ul>
-          <div className="flex items-center gap-2">
-            <button onClick={handleAddStep} className="btn btn-sm btn-outline btn-primary">
+          <div className="flex items-center gap-2 bg-white pl-2">
+            <button
+              onClick={handleAddStep}
+              className="flex items-center gap-1 text-blue-600 hover:underline focus:outline-none bg-white"
+            >
+              <FaPlus className="text-xs text-indigo-400" />
+            </button>
+            <input
+              type="text"
+              value={newStep}
+              onChange={(e) => setNewStep(e.target.value)}
+              placeholder="Add step"
+              className="input border-none w-full focus:outline-none"
+            />
+          </div>
+
+          {/* <div className="flex items-center gap-2">
+            <button
+              onClick={handleAddStep}
+              className="btn btn-sm btn-outline btn-primary"
+            >
               + Step
             </button>
             <input
@@ -83,13 +211,11 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete }) => {
               placeholder="Enter step"
               className="input input-sm input-bordered w-full"
             />
-          </div>
+          </div> */}
         </div>
-
-        {/* Task Options */}
-        <div className="space-y-3">
+        <ul className="space-y-1 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white overflow-hidden px-4">
           <OptionRow icon={<FaSun />} label="Add to My Day" />
-          
+
           {/* <div className="flex items-center justify-between p-3 rounded-lg bg-base-200 shadow-sm">
             <div className="flex items-center gap-2">
               <div className="bg-blue-600 text-white text-xs px-2 py-1 rounded">SVG</div>
@@ -100,23 +226,30 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete }) => {
             </div>
           </div> */}
           <OptionRow icon={<FaPaperclip />} label="Add file" />
-        </div>
-
-        {/* Notes */}
+        </ul>
         <div>
-          <p className="text-sm text-gray-500 mb-1">Add note</p>
+          {/* <p className="text-sm text-gray-500 mb-1">Add note</p> */}
           <textarea
-            className="textarea textarea-bordered w-full text-sm"
-            rows={3}
-            placeholder="Write a note..."
+            className="textarea textarea-bordered w-full text-sm resize-none"
+            rows={2}
+            placeholder="Add Note"
           ></textarea>
-           <p className="text-xs text-gray-400">Updated 2 hours ago</p>
+          {/* <p className="text-xs text-gray-400">Updated 2 hours ago</p> */}
         </div>
       </div>
 
       <div className="px-4 py-3 bg-base-200 rounded-b-lg flex items-center justify-between text-xs text-gray-500 shadow-inner">
-        <span>Created Yesterday</span>
-        <button onClick={() => onDelete(task._id)} className="text-red-600 hover:text-red-800">
+      <button
+          onClick={onClose}
+          className="text-gray-400 hover:text-red-800 text-left cursor-pointer"
+        >
+          <FaAngleRight />
+        </button>
+        <span className="text-center w-full">Created Yesterday</span>
+        <button
+          onClick={() => onDelete(task._id)}
+          className="text-gray-400 hover:text-red-800 text-right cursor-pointer"
+        >
           <FaTrashAlt />
         </button>
       </div>
@@ -124,11 +257,14 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete }) => {
   );
 };
 
-const OptionRow: React.FC<{ icon: React.ReactNode; label: string }> = ({ icon, label }) => (
-  <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-    <div className="text-gray-600">{icon}</div>
-    <span>{label}</span>
-  </div>
+const OptionRow: React.FC<{ icon: React.ReactNode; label: string }> = ({
+  icon,
+  label,
+}) => (
+  <li className="flex items-center py-3 cursor-pointer hover:bg-gray-50 transition">
+    <div className="text-gray-400 me-3 text-sm">{icon}</div>
+    <span className="text-gray-400 text-sm">{label}</span>
+  </li>
 );
 
 export default TaskPanel;

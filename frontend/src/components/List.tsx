@@ -39,43 +39,49 @@ const List = ({ list: listToDelete }: ListProps) => {
   };
 
   return (
-    <li key={listToDelete._id} className="group">
-      <div
-        role="button"
-        tabIndex={0}
-        className={`flex items-center gap-3 p-3 w-full rounded-md transition cursor-pointer ${
-          activeList?._id === listToDelete._id
-            ? "bg-primary text-white"
-            : "hover:bg-base-300"
-        }`}
-        onClick={() => setActiveList(listToDelete)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setActiveList(listToDelete);
-          }
-        }}
-      >
-        <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-3">
-            {listToDelete.icon}
-            <span className="ml-3">{listToDelete.name}</span>
+    <>
+      <li key={listToDelete._id} className="relative group">
+        {activeList?._id === listToDelete._id && (
+          <div className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 bg-indigo-500 rounded-2xl" />
+        )}
+
+        <div
+          role="button"
+          tabIndex={0}
+          className={`flex items-center gap-3 pl-3 pr-2 py-2 w-full rounded-md transition cursor-pointer text-gray-600 ${
+            activeList?._id === listToDelete._id
+              ? "bg-gray-200/75"
+              : "hover:bg-base-200"
+          }`}
+          onClick={() => setActiveList(listToDelete)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setActiveList(listToDelete);
+            }
+          }}
+        >
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-3">
+              {listToDelete.icon}
+              <span>{listToDelete.name}</span>
+            </div>
+            {listToDelete.canDelete && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteList(listToDelete._id);
+                }}
+                className="btn btn-sm tooltip invisible group-hover:visible transition-all"
+                data-tip="Delete"
+              >
+                <FaTrash />
+              </button>
+            )}
           </div>
-          {listToDelete.canDelete && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteList(listToDelete._id);
-              }}
-              className="btn btn-sm tooltip invisible group-hover:visible transition-all"
-              data-tip="Delete"
-            >
-              <FaTrash />
-            </button>
-          )}
         </div>
-      </div>
-    </li>
+      </li>
+    </>
   );
 };
 

@@ -12,6 +12,8 @@ interface TaskStore {
   editingTaskId: string | null;
   editTask: (id: string, newTitle: string) => void;
   setEditingTask: (id: string | null) => void;
+  activeTaskId: string | null;
+  setActiveTaskId: (id: string | null) => void;
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
@@ -41,13 +43,13 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       ),
     })),
 
-    toggleImportant: (id) =>
-      set((state) => ({
-        tasks: state.tasks.map((task) =>
-          task._id === id ? { ...task, isStarred: !task.isStarred } : task
-        ),
-      })),
-  
+  toggleImportant: (id) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task._id === id ? { ...task, isStarred: !task.isStarred } : task
+      ),
+    })),
+
   editingTaskId: null,
   editTask: (id, newTitle) =>
     set((state) => ({
@@ -58,4 +60,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     })),
 
   setEditingTask: (id) => set({ editingTaskId: id }),
+
+  activeTaskId: null,
+  setActiveTaskId: (id) => set({ activeTaskId: id }),
 }));

@@ -10,6 +10,7 @@ export interface TaskType {
   listId: string;
   completed: boolean;
   isStarred?: boolean;
+  isMyDay?: boolean;
   steps?: Step[];
   priority?: PriorityEnum;
 }
