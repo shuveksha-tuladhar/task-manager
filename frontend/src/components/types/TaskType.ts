@@ -1,6 +1,7 @@
 import { PriorityEnum } from "./PriorityEnum";
 
 export interface Step {
+  _id?: string;
   title: string;
   completed: boolean;
 }

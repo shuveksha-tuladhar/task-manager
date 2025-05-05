@@ -3,10 +3,17 @@ import { useListStore } from "../stores/useListStores";
 import { ListType } from "./types/ListType";
 import { postApi } from "../util/api";
 import useGlobalStore from "../stores/useGlobalStore";
+import { useTaskStore } from "../stores/useTaskStores";
 
 const AddList: React.FC = () => {
-  const { listInput, setListInput, list, setList, setActiveList } =
-    useListStore();
+  const {
+    listInput,
+    setListInput,
+    lists: list,
+    setLists: setList,
+    setActiveList,
+  } = useListStore();
+  const { setActiveTaskId } = useTaskStore();
   const { addToast } = useGlobalStore();
 
   const handleAddList = () => {
@@ -26,6 +33,7 @@ const AddList: React.FC = () => {
           setList([...list, filteredData]);
           setListInput("");
           setActiveList(filteredData);
+          setActiveTaskId(null);
           addToast({ message: "List added successfully", type: "success" });
         } else {
           console.error(resp.error);

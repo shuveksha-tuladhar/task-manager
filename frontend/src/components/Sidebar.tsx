@@ -8,22 +8,26 @@ import { useListStore } from "../stores/useListStores";
 import { iconEnumMap } from "./utils/iconEnumMap";
 import AddList from "./AddList";
 import { ListEnum } from "./types/ListEnum";
+import { useTaskStore } from "../stores/useTaskStores";
 
 const Sidebar: React.FC = () => {
-  const { list: lists, setList, setActiveList } = useListStore();
+  const { lists: lists, setLists: setList, setActiveList } = useListStore();
+  const { setActiveTaskId } = useTaskStore();
+
   useEffect(() => {
     getApi<ListType[]>("/api/lists")
       .then((resp) => {
         if (resp.data) {
           setList(resp.data);
           setActiveList(resp.data[0]);
+          setActiveTaskId(null);
         }
       })
       .catch((err) => {
         console.error(err);
         throw err;
       });
-  }, [setList, setActiveList]);
+  }, [setList, setActiveList, setActiveTaskId]);
 
   return (
     <div className="flex flex-col w-64 bg-gray-50 border-t-[1px] border-t-black/10">
