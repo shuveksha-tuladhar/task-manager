@@ -1,4 +1,4 @@
-import { useTaskStore } from "../stores/useTaskStores";
+import { useTaskStore } from "../stores/useTaskStore";
 import { patchApi } from "../util/api";
 import useGlobalStore from "../stores/useGlobalStore";
 import { TaskType } from "./types/TaskType";
@@ -7,7 +7,7 @@ import CheckableLabelItem from "./CheckableLabelItem";
 
 const TaskItem = ({ task }: TaskProps) => {
   const { addToast } = useGlobalStore();
-  const { toggleComplete, setActiveTaskId, toggleImportant } = useTaskStore();
+  const { toggleFieldValue, setActiveTaskId } = useTaskStore();
 
   const completeTask = () => {
     patchApi<TaskType>("/api/tasks/" + task._id, {
@@ -15,7 +15,7 @@ const TaskItem = ({ task }: TaskProps) => {
     })
       .then((res) => {
         if (res.data) {
-          toggleComplete(task._id);
+          toggleFieldValue(task._id, "completed");
         }
       })
       .catch((error) => {
@@ -30,7 +30,7 @@ const TaskItem = ({ task }: TaskProps) => {
     })
       .then((res) => {
         if (res.data) {
-          toggleImportant(task._id);
+          toggleFieldValue(task._id, "isStarred");
         }
       })
       .catch((error) => {
@@ -51,7 +51,8 @@ const TaskItem = ({ task }: TaskProps) => {
           onToggleStarred={toggleImportantTask}
           metadata={{
             isInMyDay: task.isMyDay ?? false,
-            completedSubtasks: task.steps?.filter(step => step.completed).length,
+            completedSubtasks: task.steps?.filter((step) => step.completed)
+              .length,
             totalSubtasks: task.steps?.length,
             // attachedFileCount: 0,
           }}

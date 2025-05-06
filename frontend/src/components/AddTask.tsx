@@ -1,6 +1,6 @@
 import { FaPlus } from "react-icons/fa";
-import { useTaskStore } from "../stores/useTaskStores";
-import { useListStore } from "../stores/useListStores";
+import { useTaskStore } from "../stores/useTaskStore";
+import { useListStore } from "../stores/useListStore";
 import { postApi } from "../util/api";
 import { TaskType } from "./types/TaskType";
 import useGlobalStore from "../stores/useGlobalStore";
@@ -48,6 +48,7 @@ const AddTask: React.FC = () => {
         placeholder="Add a task..."
         className="input input-bordered flex-1"
         value={taskInput}
+        onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
         onChange={(e) => setTaskInput(e.target.value)}
       />
       <button

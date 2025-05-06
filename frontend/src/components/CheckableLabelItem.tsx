@@ -38,7 +38,9 @@ const CheckableLabelItem = ({
               type="text"
               defaultValue={label}
               onBlur={(e) => onLabelChange?.(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && onLabelChange?.(e.currentTarget.value)}
+              onKeyDown={(e) =>
+                e.key === "Enter" && onLabelChange?.(e.currentTarget.value)
+              }
               className="w-full"
               autoFocus
             />
@@ -61,9 +63,12 @@ const CheckableLabelItem = ({
                 </span>
               )}
               {metadata.completedSubtasks !== undefined &&
-                metadata.totalSubtasks !== undefined && (
+                metadata.totalSubtasks !== undefined &&
+                metadata.totalSubtasks > 0 && (
                   <span className="flex items-center gap-1">
-                    <FaCheck />
+                    {metadata.completedSubtasks === metadata.totalSubtasks && (
+                      <FaCheck />
+                    )}
                     {` ${metadata.completedSubtasks} of ${metadata.totalSubtasks}`}
                   </span>
                 )}

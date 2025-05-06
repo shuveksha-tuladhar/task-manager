@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { useFormStore } from "../stores/useFormStores";
+import { useFormStore } from "../stores/useFormStore";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../util/api";
 import Title from "../components/Title";

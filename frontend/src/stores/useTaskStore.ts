@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { TaskType } from "../components/types/TaskType";
+
 interface TaskStore {
   tasks: TaskType[];
   setTasks: (tasks: TaskType[]) => void;
@@ -7,8 +8,10 @@ interface TaskStore {
   setTaskInput: (title: string) => void;
   addTask: (task: TaskType) => void;
   removeTask: (id: string) => void;
-  toggleComplete: (id: string) => void;
-  toggleImportant: (id: string) => void;
+  toggleFieldValue: (
+    id: string,
+    field: keyof Pick<TaskType, "completed" | "isStarred" | "isMyDay">
+  ) => void;
   editingTaskId: string | null;
   editTask: (id: string, newTitle: string) => void;
   setEditingTask: (id: string | null) => void;
@@ -18,11 +21,11 @@ interface TaskStore {
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
   tasks: [],
-  setTasks: (tasks: TaskType[]) => set({ tasks }),
+  setTasks: (tasks) => set({ tasks }),
   taskInput: "",
   setTaskInput: (title) => set({ taskInput: title }),
 
-  addTask: (task: TaskType) => {
+  addTask: (task) => {
     const { taskInput, tasks } = get();
     if (taskInput.trim()) {
       set({
@@ -31,22 +34,18 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       });
     }
   },
+
   removeTask: (id) =>
     set((state) => ({
       tasks: state.tasks.filter((task) => task._id !== id),
     })),
 
-  toggleComplete: (id) =>
+  toggleFieldValue: (id, field) =>
     set((state) => ({
       tasks: state.tasks.map((task) =>
-        task._id === id ? { ...task, completed: !task.completed } : task
-      ),
-    })),
-
-  toggleImportant: (id) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task._id === id ? { ...task, isStarred: !task.isStarred } : task
+        task._id === id && typeof task[field] === "boolean"
+          ? { ...task, [field]: !task[field] }
+          : task
       ),
     })),
 

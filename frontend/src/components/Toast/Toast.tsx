@@ -12,7 +12,7 @@ const Toast: React.FC = () => {
   if (!toast) return null;
 
   return (
-    <div className="toast toast-top toast-end">
+    <div className="toast toast-top toast-center">
       <div className={`alert ${`alert-${toast.type}`} text-white`}>
         <span>{toast.message}</span>
         <button onClick={removeToast} className="btn btn-sm">

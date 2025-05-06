@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   FaTrashAlt,
   FaSun,
@@ -6,12 +6,13 @@ import {
   FaPlus,
   FaAngleRight,
 } from "react-icons/fa";
-import { TaskType } from "./types/TaskType";
+import { Step, TaskType } from "./types/TaskType";
 import { TaskPanelProps } from "./types/TaskPanelProps";
-import { useTaskStore } from "../stores/useTaskStores";
+import { useTaskStore } from "../stores/useTaskStore";
 import useGlobalStore from "../stores/useGlobalStore";
 import { patchApi } from "../util/api";
 import CheckableLabelItem from "./CheckableLabelItem";
+import { useTaskStepStore } from "../stores/useTaskStepStore";
 
 const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
   const { addToast } = useGlobalStore();
@@ -19,11 +20,18 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
     editTask,
     setEditingTask,
     editingTaskId,
-    toggleImportant,
-    toggleComplete,
+    toggleFieldValue,
   } = useTaskStore();
 
-  const [newStep, setNewStep] = useState("");
+  const {
+    stepInput,
+    setStepInput,
+    editingStepId,
+    setEditingStep,
+    toggleStepComplete,
+    updateSteps,
+    removeStep,
+  } = useTaskStepStore();
 
   if (!task) return null;
 
@@ -35,7 +43,7 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
     })
       .then((res) => {
         if (res.data) {
-          toggleComplete(task._id);
+          toggleFieldValue(task._id, "completed");
         }
       })
       .catch((error) => {
@@ -50,24 +58,13 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
     })
       .then((res) => {
         if (res.data) {
-          toggleImportant(task._id);
+          toggleFieldValue(task._id, "isStarred");
         }
       })
       .catch((error) => {
         console.error(error);
         addToast({ message: "Error updating task importance", type: "error" });
       });
-  };
-
-  const handleAddStep = () => {
-    if (newStep.trim()) {
-      console.log("New step added");
-      setNewStep("");
-    }
-  };
-
-  const handleRemoveStep = (index: number) => {
-    console.log("Handle remove step:", index);
   };
 
   const handleEdit = (newTitle: string) => {
@@ -78,10 +75,6 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
         .then((res) => {
           if (res.data) {
             editTask(task._id, newTitle);
-            addToast({
-              message: "Title updated successfully",
-              type: "success",
-            });
           } else {
             addToast({ message: "Error updating title", type: "error" });
           }
@@ -94,6 +87,104 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
         });
     } else {
       setEditingTask(null);
+    }
+  };
+
+  const completeStepForTask = (stepId?: string) => {
+    if (!stepId) return;
+
+    const updatedSteps = task.steps?.map((step) =>
+      step._id === stepId ? { ...step, completed: !step.completed } : step
+    );
+
+    patchApi<TaskType>("/api/tasks/" + task._id, {
+      steps: updatedSteps,
+    })
+      .then((res) => {
+        if (res.data) {
+          toggleStepComplete(task._id, stepId);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        addToast({ message: "Error updating task step", type: "error" });
+      });
+  };
+
+  const handleAddStep = () => {
+    if (stepInput.trim()) {
+      console.log("New step added");
+      setStepInput("");
+
+      patchApi<TaskType>("/api/tasks/" + task._id, {
+        steps: [
+          ...(task?.steps ?? []),
+          { title: stepInput, completed: false } as Step,
+        ],
+      })
+        .then((resp) => {
+          if (resp.data) {
+            updateSteps(task._id, resp.data.steps ?? []);
+          } else {
+            addToast({ message: "Error adding step", type: "error" });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          addToast({ message: "Error adding step", type: "error" });
+        });
+    }
+  };
+
+  const handleRemoveStep = (stepId?: string) => {
+    if (!stepId) return;
+    const updatedSteps = task.steps?.filter((step) => step._id !== stepId);
+
+    patchApi<TaskType>("/api/tasks/" + task._id, {
+      steps: updatedSteps,
+    })
+      .then((resp) => {
+        if (resp.data) {
+          removeStep(task._id, stepId);
+        } else {
+          addToast({ message: "Error deleting step", type: "error" });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        addToast({ message: "Error deleting step", type: "error" });
+      });
+  };
+
+  const handleStepEdit = (stepId: string | null, newTitle: string) => {
+    if (!task || !task.steps) return;
+
+    const currentStep = task.steps.find((step) => step._id === stepId);
+    if (!currentStep) return;
+
+    if (newTitle.trim() && newTitle !== currentStep.title) {
+      const updatedSteps = task.steps.map((step) =>
+        step._id === stepId ? { ...step, title: newTitle } : step
+      );
+
+      patchApi<TaskType>("/api/tasks/" + task._id, {
+        steps: updatedSteps,
+      })
+        .then((res) => {
+          if (res.data) {
+            updateSteps(task._id, res.data.steps ?? []);
+          } else {
+            addToast({ message: "Error updating step title", type: "error" });
+          }
+          setEditingStep(null);
+        })
+        .catch((error) => {
+          console.error(error);
+          addToast({ message: "Error updating step title", type: "error" });
+          setEditingStep(null);
+        });
+    } else {
+      setEditingStep(null);
     }
   };
 
@@ -123,11 +214,13 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
                   key={step._id}
                   label={step.title}
                   checked={step.completed}
-                  onComplete={() => console.log("Steps completed")}
+                  onComplete={() => completeStepForTask(step._id)}
+                  onLabelClick={() => setEditingStep(step._id ?? null)}
+                  isEditing={step._id === editingStepId}
                   onLabelChange={(newLabel: string) =>
-                    console.log("Label changed to:", newLabel)
+                    handleStepEdit(step._id ?? null, newLabel)
                   }
-                  onDelete={() => handleRemoveStep(index)}
+                  onDelete={() => handleRemoveStep(step._id)}
                 />
               </li>
             ))}
@@ -141,9 +234,10 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
             </button>
             <input
               type="text"
-              value={newStep}
-              onChange={(e) => setNewStep(e.target.value)}
+              value={stepInput}
+              onChange={(e) => setStepInput(e.target.value)}
               placeholder="Add step"
+              onKeyDown={(e) => e.key === "Enter" && handleAddStep()}
               className="input border-none w-full focus:outline-none"
             />
           </div>

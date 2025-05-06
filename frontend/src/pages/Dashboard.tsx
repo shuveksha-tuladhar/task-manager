@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import TaskList from "../components/TaskList";
-import { useTaskStore } from "../stores/useTaskStores";
+import { useTaskStore } from "../stores/useTaskStore";
 import { getApi } from "../util/api";
 import { TaskType } from "../components/types/TaskType";
 import AddTask from "../components/AddTask";

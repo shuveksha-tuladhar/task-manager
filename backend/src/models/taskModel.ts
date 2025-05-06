@@ -1,5 +1,9 @@
 import { Schema, model, Document, Types } from "mongoose";
 
+interface Step {
+  title: string;
+  completed: boolean;
+}
 export interface ITask extends Document {
   title: string;
   listId: Types.ObjectId;
@@ -7,10 +11,19 @@ export interface ITask extends Document {
   assignedTo: Types.ObjectId[];
   completed: boolean;
   priority?: "low" | "medium" | "high";
+  steps?: Step[];
   isStarred?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const stepSchema = new Schema<Step>(
+  {
+    title: { type: String, required: true },
+    completed: { type: Boolean, default: false },
+  },
+);
+
 
 const taskSchema = new Schema<ITask>(
   {
@@ -40,6 +53,10 @@ const taskSchema = new Schema<ITask>(
       type: Boolean,
       required: true,
       default: false,
+    },
+    steps: {
+      type: [stepSchema],
+      required: false,
     },
     priority: {
       type: String,

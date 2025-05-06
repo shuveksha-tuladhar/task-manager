@@ -1,9 +1,9 @@
 import { FaTrash } from "react-icons/fa";
-import { useListStore } from "../stores/useListStores";
+import { useListStore } from "../stores/useListStore";
 import { ListProps } from "./types/ListProps";
 import { deleteApi } from "../util/api";
 import useGlobalStore from "../stores/useGlobalStore";
-import { useTaskStore } from "../stores/useTaskStores";
+import { useTaskStore } from "../stores/useTaskStore";
 
 const List = ({ list }: ListProps) => {
   const { lists, activeList, setActiveList, removeList } = useListStore();

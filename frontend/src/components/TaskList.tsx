@@ -1,7 +1,7 @@
-import { useListStore } from "../stores/useListStores";
+import { useListStore } from "../stores/useListStore";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import TaskItem from "./TaskItem";
-import { useTaskStore } from "../stores/useTaskStores";
+import { useTaskStore } from "../stores/useTaskStore";
 import { TaskType } from "./types/TaskType";
 import { ListEnum } from "./types/ListEnum";
 import TaskPanel from "./TaskPanel";

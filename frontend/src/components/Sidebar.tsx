@@ -4,11 +4,11 @@ import { ListType } from "./types/ListType";
 import { useEffect } from "react";
 import List from "./List";
 import { getApi } from "../util/api";
-import { useListStore } from "../stores/useListStores";
+import { useListStore } from "../stores/useListStore";
 import { iconEnumMap } from "./utils/iconEnumMap";
 import AddList from "./AddList";
 import { ListEnum } from "./types/ListEnum";
-import { useTaskStore } from "../stores/useTaskStores";
+import { useTaskStore } from "../stores/useTaskStore";
 
 const Sidebar: React.FC = () => {
   const { lists: lists, setLists: setList, setActiveList } = useListStore();

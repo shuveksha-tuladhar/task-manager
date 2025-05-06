@@ -1,9 +1,9 @@
 import { FaPlus } from "react-icons/fa";
-import { useListStore } from "../stores/useListStores";
+import { useListStore } from "../stores/useListStore";
 import { ListType } from "./types/ListType";
 import { postApi } from "../util/api";
 import useGlobalStore from "../stores/useGlobalStore";
-import { useTaskStore } from "../stores/useTaskStores";
+import { useTaskStore } from "../stores/useTaskStore";
 
 const AddList: React.FC = () => {
   const {
@@ -60,6 +60,7 @@ const AddList: React.FC = () => {
         placeholder="New List"
         className="input border-none w-full focus:outline-none"
         value={listInput}
+        onKeyDown={(e) => e.key === "Enter" && handleAddList()}
         onChange={(e) => setListInput(e.target.value)}
       />
     </div>
