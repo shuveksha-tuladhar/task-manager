@@ -1,5 +1,5 @@
 import { FaCheck, FaPaperclip, FaRegStar, FaStar, FaSun } from "react-icons/fa";
-import { FaXmark } from "react-icons/fa6";
+import { FaNoteSticky, FaXmark } from "react-icons/fa6";
 import { CheckableLabelItemProps } from "./types/CheckableLabelItemProps";
 
 const CheckableLabelItem = ({
@@ -82,6 +82,11 @@ const CheckableLabelItem = ({
                         } attached`
                       : "0 Files attached"}
                   </span>
+                </span>
+              )}
+              {metadata.hasNote && (
+                <span className="flex items-center gap-1">
+                  <FaNoteSticky /> <span>Note</span>
                 </span>
               )}
             </div>

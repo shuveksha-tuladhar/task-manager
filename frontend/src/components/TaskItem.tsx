@@ -54,6 +54,7 @@ const TaskItem = ({ task }: TaskProps) => {
             completedSubtasks: task.steps?.filter((step) => step.completed)
               .length,
             totalSubtasks: task.steps?.length,
+            hasNote: !!task.note,
             // attachedFileCount: 0,
           }}
         />

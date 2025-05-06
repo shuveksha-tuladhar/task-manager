@@ -14,4 +14,5 @@ export interface TaskType {
   isMyDay?: boolean;
   steps?: Step[];
   priority?: PriorityEnum;
+  note?: string;
 }

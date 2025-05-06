@@ -18,5 +18,6 @@ export interface CheckableLabelItemProps {
     completedSubtasks?: number;
     totalSubtasks?: number;
     attachedFileCount?: number;
+    hasNote?: boolean;
   };
 }

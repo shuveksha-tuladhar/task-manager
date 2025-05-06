@@ -17,6 +17,9 @@ interface TaskStore {
   setEditingTask: (id: string | null) => void;
   activeTaskId: string | null;
   setActiveTaskId: (id: string | null) => void;
+  noteInput: string;
+  setNoteInput: (note: string) => void;
+  editNote: (id: string, note: string) => void;
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
@@ -24,6 +27,8 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   setTasks: (tasks) => set({ tasks }),
   taskInput: "",
   setTaskInput: (title) => set({ taskInput: title }),
+  noteInput: "",
+  setNoteInput: (note) => set({ noteInput: note }),
 
   addTask: (task) => {
     const { taskInput, tasks } = get();
@@ -62,4 +67,10 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
 
   activeTaskId: null,
   setActiveTaskId: (id) => set({ activeTaskId: id }),
+  editNote: (id, note) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task._id === id ? { ...task, note } : task
+      ),
+    })),
 }));

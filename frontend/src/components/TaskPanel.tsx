@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   FaTrashAlt,
   FaSun,
@@ -13,6 +13,7 @@ import useGlobalStore from "../stores/useGlobalStore";
 import { patchApi } from "../util/api";
 import CheckableLabelItem from "./CheckableLabelItem";
 import { useTaskStepStore } from "../stores/useTaskStepStore";
+import { FaXmark } from "react-icons/fa6";
 
 const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
   const { addToast } = useGlobalStore();
@@ -21,6 +22,9 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
     setEditingTask,
     editingTaskId,
     toggleFieldValue,
+    noteInput,
+    setNoteInput,
+    editNote,
   } = useTaskStore();
 
   const {
@@ -32,6 +36,10 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
     updateSteps,
     removeStep,
   } = useTaskStepStore();
+
+  useEffect(() => {
+    setNoteInput(task?.note ?? "");
+  }, [task?.note, setNoteInput]);
 
   if (!task) return null;
 
@@ -67,6 +75,21 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
       });
   };
 
+  const toggleMyDay = () => {
+    patchApi<TaskType>("/api/tasks/" + task._id, {
+      isMyDay: !task.isMyDay,
+    })
+      .then((res) => {
+        if (res.data) {
+          toggleFieldValue(task._id, "isMyDay");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        addToast({ message: "Error updating isMyDay", type: "error" });
+      });
+  };
+
   const handleEdit = (newTitle: string) => {
     if (newTitle.trim() && newTitle !== task.title) {
       patchApi<TaskType>("/api/tasks/" + task._id, {
@@ -87,6 +110,22 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
         });
     } else {
       setEditingTask(null);
+    }
+  };
+
+  const updateNote = () => {
+    if (noteInput !== task.note) {
+      patchApi<TaskType>("/api/tasks/" + task._id, {
+        note: noteInput.trim() ?? null,
+      })
+        .then((res) => {
+          console.log("Note updated:", res);
+          editNote(task._id, noteInput.trim());
+        })
+        .catch((error) => {
+          console.error(error);
+          addToast({ message: "Error updating note", type: "error" });
+        });
     }
   };
 
@@ -243,7 +282,36 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
           </div>
         </div>
         <ul className="space-y-1 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white overflow-hidden px-4">
-          <OptionRow icon={<FaSun />} label="Add to My Day" />
+          <li
+            className="flex items-center py-3 cursor-pointer hover:bg-gray-50 transition"
+            onClick={() => {
+              toggleMyDay();
+            }}
+          >
+            <div
+              className={`me-3 text-sm ${
+                task.isMyDay ? "text-blue-500" : "text-gray-400"
+              }`}
+            >
+              <span>
+                <FaSun />
+              </span>
+            </div>
+            <div
+              className={`text-sm flex-grow ${
+                task.isMyDay ? "text-blue-500" : "text-gray-400"
+              }`}
+            >
+              {task.isMyDay ? "Added to My Day" : "Add to My Day"}
+            </div>
+            {task.isMyDay && (
+              <FaXmark
+                className={`me-3 text-sm ${
+                  task.isMyDay ? "text-blue-500" : "text-gray-400"
+                }`}
+              />
+            )}
+          </li>
 
           {/* <div className="flex items-center justify-between p-3 rounded-lg bg-base-200 shadow-sm">
             <div className="flex items-center gap-2">
@@ -261,6 +329,9 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
             className="textarea textarea-bordered w-full text-sm resize-none"
             rows={2}
             placeholder="Add Note"
+            value={noteInput}
+            onChange={(e) => setNoteInput(e.target.value)}
+            onBlur={updateNote}
           ></textarea>
           {/* <p className="text-xs text-gray-400">Updated 2 hours ago</p> */}
         </div>
@@ -285,14 +356,28 @@ const TaskPanel: React.FC<TaskPanelProps> = ({ task, onDelete, onClose }) => {
   );
 };
 
-const OptionRow: React.FC<{ icon: React.ReactNode; label: string }> = ({
-  icon,
-  label,
-}) => (
-  <li className="flex items-center py-3 cursor-pointer hover:bg-gray-50 transition">
-    <div className="text-gray-400 me-3 text-sm">{icon}</div>
-    <span className="text-gray-400 text-sm">{label}</span>
-  </li>
-);
+const OptionRow: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  onToggle?: () => void;
+  onDelete?: () => void;
+  colorClassName?: string;
+}> = ({ icon, label, onDelete, onToggle, colorClassName }) => {
+  const color = colorClassName ?? "text-gray-400";
+  return (
+    <li
+      className="flex items-center py-3 cursor-pointer hover:bg-gray-50 transition"
+      onClick={onToggle}
+    >
+      <div className={`me-3 text-sm ${color}`}>{icon}</div>
+      <div className={`text-sm flex-grow ${color}`}>{label}</div>
+      {onDelete && (
+        <span>
+          <FaXmark className={`${color}`} onClick={onDelete} />
+        </span>
+      )}
+    </li>
+  );
+};
 
 export default TaskPanel;
