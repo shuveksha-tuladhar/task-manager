@@ -13,17 +13,16 @@ export interface ITask extends Document {
   priority?: "low" | "medium" | "high";
   steps?: Step[];
   isStarred?: boolean;
+  isMyDay?: boolean;
+  note?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const stepSchema = new Schema<Step>(
-  {
-    title: { type: String, required: true },
-    completed: { type: Boolean, default: false },
-  },
-);
-
+const stepSchema = new Schema<Step>({
+  title: { type: String, required: true },
+  completed: { type: Boolean, default: false },
+});
 
 const taskSchema = new Schema<ITask>(
   {
@@ -49,6 +48,10 @@ const taskSchema = new Schema<ITask>(
       type: Boolean,
       default: false,
     },
+    isMyDay: {
+      type: Boolean,
+      default: false,
+    },
     completed: {
       type: Boolean,
       required: true,
@@ -61,6 +64,10 @@ const taskSchema = new Schema<ITask>(
     priority: {
       type: String,
       enum: ["low", "medium", "high"],
+    },
+    note: {
+      type: String,
+      required: false,
     },
     createdAt: {
       type: Date,
