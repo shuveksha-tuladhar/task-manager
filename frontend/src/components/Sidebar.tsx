@@ -9,7 +9,6 @@ import { iconEnumMap } from "./utils/iconEnumMap";
 import AddList from "./AddList";
 import { ListEnum } from "./types/ListEnum";
 import { useTaskStore } from "../stores/useTaskStore";
-import getStaticLists from "../util/generateStaticList";
 
 const Sidebar: React.FC = () => {
   const {
