@@ -9,9 +9,15 @@ import { iconEnumMap } from "./utils/iconEnumMap";
 import AddList from "./AddList";
 import { ListEnum } from "./types/ListEnum";
 import { useTaskStore } from "../stores/useTaskStore";
+import getStaticLists from "../util/generateStaticList";
 
 const Sidebar: React.FC = () => {
-  const { lists: lists, setLists: setList, setActiveList } = useListStore();
+  const {
+    lists,
+    setLists: setList,
+    setActiveList,
+    staticLists,
+  } = useListStore();
   const { setActiveTaskId } = useTaskStore();
 
   useEffect(() => {
@@ -19,7 +25,7 @@ const Sidebar: React.FC = () => {
       .then((resp) => {
         if (resp.data) {
           setList(resp.data);
-          setActiveList(resp.data[0]);
+          setActiveList(staticLists[0]);
           setActiveTaskId(null);
         }
       })
@@ -27,7 +33,7 @@ const Sidebar: React.FC = () => {
         console.error(err);
         throw err;
       });
-  }, [setList, setActiveList, setActiveTaskId]);
+  }, [setList, setActiveList, setActiveTaskId, staticLists]);
 
   return (
     <div className="flex flex-col w-64 bg-gray-50 border-t-[1px] border-t-black/10">
@@ -55,8 +61,7 @@ const Sidebar: React.FC = () => {
 
         <aside className="w-64 bg-gray-50 text-sm flex flex-col">
           <ul className="space-y-2">
-            {lists
-              .filter((list) => !list.canDelete)
+            {staticLists
               .map((list) => {
                 const IconComponent =
                   iconEnumMap[list.name as ListEnum]?.icon || FaTasks;

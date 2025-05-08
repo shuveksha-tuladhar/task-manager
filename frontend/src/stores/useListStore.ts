@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { ListType } from "../components/types/ListType";
+import getStaticLists from "../util/generateStaticList";
 interface ListStore {
+  staticLists: ListType[];
   lists: ListType[];
   activeList: ListType | null;
   listInput: string;
@@ -11,6 +13,7 @@ interface ListStore {
 }
 
 export const useListStore = create<ListStore>((set) => ({
+  staticLists: getStaticLists(),
   lists: [],
   activeList: null,
   listInput: "",

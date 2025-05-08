@@ -8,6 +8,7 @@ import TaskPanel from "./TaskPanel";
 import { useState } from "react";
 import useGlobalStore from "../stores/useGlobalStore";
 import { deleteApi } from "../util/api";
+import { iconEnumMap } from "./utils/iconEnumMap";
 
 const TaskList: React.FC = () => {
   const { openModal, closeModal, addToast } = useGlobalStore();
@@ -15,12 +16,18 @@ const TaskList: React.FC = () => {
   const [isCompletedOpen, setIsCompletedOpen] = useState<boolean>(true);
   const { tasks, activeTaskId, setActiveTaskId, removeTask } = useTaskStore();
 
-  const filteredTasks: TaskType[] =
-    activeList?.name === ListEnum.Important
-      ? tasks.filter(
-          (task) => task.isStarred || task.listId === activeList?._id
-        )
-      : tasks.filter((task) => task.listId === activeList?._id);
+  const filteredTasks: TaskType[] = (() => {
+    const fieldName = iconEnumMap[activeList?.name as ListEnum]?.fieldName;
+
+    if (fieldName) {
+      return tasks.filter(
+        (task) =>
+          task[fieldName as keyof TaskType] || task.listId === activeList?._id
+      );
+    }
+
+    return tasks.filter((task) => task.listId === activeList?._id);
+  })();
 
   const taskNotCompleted = filteredTasks
     .filter((task) => !task.completed)
