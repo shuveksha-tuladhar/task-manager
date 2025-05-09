@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { User } from '../components/types/UserType';
+import { create } from "zustand";
+import { User } from "../components/types/UserType";
 
 type UserState = {
   user: User | null;

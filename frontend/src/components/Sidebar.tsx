@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { FaSearch, FaTasks } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 import { ListType } from "./types/ListType";
-import { useEffect } from "react";
 import List from "./List";
 import { getApi } from "../util/api";
 import { useListStore } from "../stores/useListStore";
@@ -9,8 +10,12 @@ import { iconEnumMap } from "./utils/iconEnumMap";
 import AddList from "./AddList";
 import { ListEnum } from "./types/ListEnum";
 import { useTaskStore } from "../stores/useTaskStore";
+import { User } from "./types/UserType";
+import { useUserStore } from "../stores/useUserStore";
 
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, setUser, clearUser } = useUserStore();
   const {
     lists,
     setLists: setList,
@@ -18,6 +23,24 @@ const Sidebar: React.FC = () => {
     staticLists,
   } = useListStore();
   const { setActiveTaskId } = useTaskStore();
+
+  const getInitials = (name: string) => {
+    const words = name.trim().split(/\s+/);
+    return words.length >= 2
+      ? words[0][0].toUpperCase() + words[words.length - 1][0].toUpperCase()
+      : words[0][0].toUpperCase();
+  };
+
+  useEffect(() => {
+    getApi<User>("/api/users/profile").then((resp) => {
+      if (resp.data) {
+        console.log(resp.data);
+        setUser(resp.data);
+      } else {
+        console.error("Error fetching user data");
+      }
+    });
+  }, [setUser]);
 
   useEffect(() => {
     getApi<ListType[]>("/api/lists")
@@ -39,12 +62,36 @@ const Sidebar: React.FC = () => {
       <div className="space-y-2 mt-4 flex-grow">
         <div className="max-w-sm p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center mb-4">
-            <div className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center text-white font-medium">
-              TT
+            <div className="dropdown dropdown-bottom dropdown-start">
+              <div
+                tabIndex={0}
+                role="button"
+                className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center text-white font-medium cursor-pointer"
+              >
+                {user?.name && getInitials(user?.name)}
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-40"
+              >
+                <li>
+                  <a
+                    onClick={() => {
+                      localStorage.removeItem("token");
+                      clearUser();
+                      navigate("/");
+                    }}
+                  >
+                    Log out
+                  </a>
+                </li>
+              </ul>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-semibold text-gray-800">Test Tests</p>
-              <p className="text-xs text-gray-800">test123@gmail.com</p>
+              <p className="text-sm font-semibold text-gray-800">
+                {user?.name}
+              </p>
+              <p className="text-xs text-gray-800">{user?.email}</p>
             </div>
           </div>
 
